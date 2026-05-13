@@ -1,16 +1,17 @@
-/* chat-backend.js — local-dev stub for the portfolio chat backend.
+/* chat-backend.js
  *
- * The Chat page calls `window.portfolio.ask({ messages })` and expects a string
- * reply. In production this will be wired to a small proxy (Cloudflare Worker /
- * Vercel edge function / our own K8s service) that forwards to whichever LLM
- * provider we settle on. For local dev we install this stub so the chat surface
- * works offline with no network and no API key.
+ * - If a Groq API key is configured locally, chat uses Groq live.
+ * - Otherwise it falls back to the local keyword stub.
  *
- * The stub is a small keyword router that picks one of a few canned first-person
- * replies seeded from content.jsx — enough to demo the UI, the orbital
- * highlights, the suggested chips, and the voice loop. */
+ * Key handling is intentionally local-only to avoid exposing secrets in repo:
+ * window.portfolio.setGroqKey("gsk_...") stores it in localStorage.
+ */
 
 import C from "../content.jsx";
+
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = "llama-3.3-70b-versatile";
+const LS_KEY = "portfolio.groq.apiKey";
 
 function pickLang(messages) {
   const sys = messages.find((m) => /Always reply in (French|English)/i.test(m.content || ""));
@@ -30,13 +31,13 @@ const TEMPLATES = {
     qtodash: () =>
       `**QtoDash** is my voice-first analytics platform — you ask a business question out loud and a dashboard shows up. The fun part for me is the infrastructure: I self-host the whole thing on a 5-VM cluster — one **GitLab** runner doing CI/CD and the registry, one **NGINX** node terminating TLS, and a 3-node **Kubernetes** cluster running the API, the ASR worker and the dashboard renderer.\n\nIt's where I get to wear the DevOps hat: **Terraform** for the VMs, **Prometheus** + **Grafana** for observability, GitLab pipelines that build, push and roll out on every merge.`,
     sawti: () =>
-      `**Sawti** is the first **Darija** voice dataset I'm aware of — a crowdsourcing platform we built between ENSAM and ENSIAS. **React** frontend, **Django** API, **PostgreSQL**, **MinIO** for the audio blobs, all containerised and deployed on **Kubernetes** behind **NGINX** with **GitLab** CI shipping every merge. We've collected 1.6h from 465 contributors across Fez–Meknès, Oriental and Tangier.`,
+      `**Sawti** is a crowdsourcing platform for Moroccan **Darija** speech data. We built it with **React**, **Flask**, and **PostgreSQL** to collect voice and text contributions for ASR research. Current impact: 465 voice contributions, 619 text contributions, 1.6h recorded across 3 regions.`,
     siana: () =>
-      `At **SIANA** (joint-venture ONCF × SNCF) I own the RUL prediction pipeline for the axle fleet of 12 TGV trainsets. I built **SI-ESSIEUX**, the full-stack tracking app the maintenance teams use day-to-day — **React** + **Django** + **PostgreSQL** with real-time dashboards — and I'm running the data collection-to-modelling pipeline on top. Combining anomaly detection with time-series modelling on multi-sensor data, classical ML next to neural baselines.`,
+      `At **SIANA** (joint-venture ONCF × SNCF), my final project is industrial process digitalization for axle maintenance on 12 TGV trainsets (366 axles). I led requirements and AS-IS analysis, then TO-BE design and CdCF formalization, and built **SI-ESSIEUX** (**React/TypeScript** + **Django** + **SQL Server**). I also implemented an automated **RUL** training pipeline from data prep to re-training, and prepared test/acceptance plus progressive rollout.`,
     aiInside: () =>
       `At **AI-Inside** I trained **YOLOv8** detectors for industrial QC defect detection and shipped the platform around them — **QC Management System**, an end-to-end annotation → training → monitoring tool (Docker · React · Flask · PostgreSQL · MinIO). The tangible win was a custom annotation UI that cut data-prep time by 50%.`,
     devops: () =>
-      `My DevOps work is concentrated in two places. **QtoDash** is the deepest example — a 5-VM cluster I run end-to-end: **Kubernetes** (3 nodes, HPA, ingress), **GitLab** CI/CD with its registry, **NGINX** as the TLS-terminating reverse proxy, **Terraform** for the VMs, **Prometheus** + **Grafana** for observability. **Sawti** is the second — same K8s + GitLab + NGINX shape, just deployed for the Darija voice-collection app.`,
+      `My DevOps work is concentrated around **QtoDash**: a 5-VM setup I run end-to-end with **Kubernetes** (3 nodes, HPA, ingress), **GitLab** CI/CD + registry, **NGINX** reverse proxy, **Terraform** provisioning, and **Prometheus** + **Grafana** observability.`,
     ai: () =>
       `My ML work spans three angles. Predictive maintenance at **SIANA** — RUL on 12 TGV axles, time series + anomaly detection. Industrial computer vision at **AI-Inside** — **YOLOv8** defect detection in QC. And the side projects: **Grounding DINO** on **NVIDIA Triton** (SegmaVisionPro), an Innov'AM-winning rail-defect inspection robot running YOLOv8 on a Raspberry Pi, and a **PyTorch** voice-clone fine-tune that powers this very page.`,
     available: () =>
@@ -52,13 +53,13 @@ const TEMPLATES = {
     qtodash: () =>
       `**QtoDash** c'est ma plateforme analytique voice-first — vous posez une question à voix haute et un dashboard apparaît. Le plus intéressant pour moi c'est l'infra : tout auto-hébergé sur un cluster de 5 VMs — un runner **GitLab** pour la CI/CD et le registry, un nœud **NGINX** qui termine le TLS, et un cluster **Kubernetes** à 3 nœuds qui orchestre l'API, le worker ASR et le rendu des dashboards.\n\n**Terraform** pour les VMs, **Prometheus** + **Grafana** pour l'observabilité, des pipelines GitLab qui buildent, poussent et déploient à chaque merge.`,
     sawti: () =>
-      `**Sawti** c'est le premier dataset vocal en **Darija** — une plateforme participative entre ENSAM et ENSIAS. Frontend **React**, API **Django**, **PostgreSQL**, **MinIO** pour les fichiers audio, le tout containerisé et déployé sur **Kubernetes** derrière **NGINX**, GitLab CI livrant à chaque merge. On a déjà collecté 1,6h auprès de 465 contributeurs (Fès-Meknès, Oriental, Tanger).`,
+      `**Sawti** est une plateforme participative de collecte de données vocales en **Darija** pour la recherche ASR. Nous l'avons réalisée avec **React**, **Flask** et **PostgreSQL** pour collecter des contributions voix et textes. Impact actuel : 465 contributions voix, 619 contributions textes, 1,6h enregistrée sur 3 régions.`,
     siana: () =>
-      `Chez **SIANA** (joint-venture ONCF × SNCF) je pilote le pipeline de prédiction RUL sur le parc d'essieux des 12 rames TGV. J'ai conçu **SI-ESSIEUX**, l'application full-stack de suivi utilisée par les équipes maintenance — **React** + **Django** + **PostgreSQL** avec dashboards temps réel — et je gère le pipeline collecte-vers-modélisation par-dessus. Détection d'anomalies + séries temporelles multi-capteurs, ML classique vs réseaux de neurones.`,
+      `Chez **SIANA** (joint-venture ONCF × SNCF), mon PFE porte sur la digitalisation des processus de maintenance des essieux de 12 rames TGV (366 essieux). J'ai mené la définition du besoin et l'analyse AS-IS, puis la conception TO-BE et la formalisation du CdCF, avant de développer **SI-ESSIEUX** (**React/TypeScript** + **Django** + **SQL Server**). J'ai aussi mis en place un pipeline d'entraînement automatique **RUL** et préparé la phase test/recette avec déploiement progressif.`,
     aiInside: () =>
       `Chez **AI-Inside** j'ai entraîné des détecteurs **YOLOv8** pour la détection de défauts en contrôle qualité industriel et livré la plateforme autour — **QC Management System**, un outil bout-en-bout annotation → entraînement → suivi (Docker · React · Flask · PostgreSQL · MinIO). Gain concret : -50% sur le temps de préparation des données grâce à une UI d'annotation sur mesure.`,
     devops: () =>
-      `Mon travail DevOps est concentré sur deux projets. **QtoDash**, le plus poussé — un cluster de 5 VMs que je gère de bout en bout : **Kubernetes** (3 nœuds, HPA, ingress), **GitLab** CI/CD + registry, **NGINX** en reverse proxy TLS, **Terraform** pour les VMs, **Prometheus** + **Grafana** pour l'observabilité. **Sawti** est le second — même topologie K8s + GitLab + NGINX, déployée pour la collecte vocale en darija.`,
+      `Mon travail DevOps est surtout concentré sur **QtoDash** : une architecture 5 VMs gérée de bout en bout avec **Kubernetes** (3 nœuds, HPA, ingress), **GitLab** CI/CD + registry, **NGINX** en reverse proxy TLS, **Terraform** pour le provisionnement, et **Prometheus** + **Grafana** pour l'observabilité.`,
     ai: () =>
       `Mon travail ML couvre trois angles. Maintenance prédictive chez **SIANA** — RUL sur 12 essieux TGV, séries temporelles + détection d'anomalies. Vision industrielle chez **AI-Inside** — **YOLOv8** pour la détection de défauts en QC. Et les projets persos : **Grounding DINO** sur **NVIDIA Triton** (SegmaVisionPro), un robot d'inspection ferroviaire (Innov'AM) en **YOLOv8** embarqué sur Raspberry Pi, et un fine-tuning **PyTorch** de clone vocal qui alimente cette page.`,
     available: () =>
@@ -92,12 +93,72 @@ function route(text, lang) {
   return t.fallback();
 }
 
+function getGroqKey() {
+  if (typeof window === "undefined") return "";
+  const ls = window.localStorage.getItem(LS_KEY) || "";
+  const env = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_GROQ_API_KEY) || "";
+  return (ls || env || "").trim();
+}
+
+async function askGroq(messages, apiKey) {
+  const res = await fetch(GROQ_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      temperature: 0.3,
+      max_tokens: 700,
+      messages,
+    }),
+  });
+
+  if (!res.ok) {
+    let msg = `Groq error ${res.status}`;
+    try {
+      const err = await res.json();
+      msg = err?.error?.message || msg;
+    } catch (_) {}
+    throw new Error(msg);
+  }
+
+  const data = await res.json();
+  return data?.choices?.[0]?.message?.content?.trim() || "";
+}
+
 export function installChatBackend() {
   if (typeof window === "undefined") return;
   if (window.portfolio && typeof window.portfolio.ask === "function") return;
   window.portfolio = window.portfolio || {};
+
+  window.portfolio.setGroqKey = function setGroqKey(key) {
+    const clean = String(key || "").trim();
+    if (!clean) return false;
+    window.localStorage.setItem(LS_KEY, clean);
+    return true;
+  };
+
+  window.portfolio.clearGroqKey = function clearGroqKey() {
+    window.localStorage.removeItem(LS_KEY);
+  };
+
+  window.portfolio.chatMode = function chatMode() {
+    return getGroqKey() ? "groq" : "local-stub";
+  };
+
   window.portfolio.ask = async function ask({ messages }) {
-    // Soft delay so the typing indicator isn't a flicker.
+    const apiKey = getGroqKey();
+
+    if (apiKey) {
+      try {
+        return await askGroq(messages, apiKey);
+      } catch (_) {
+        // Fall back gracefully if key is invalid/rate-limited.
+      }
+    }
+
     await new Promise((r) => setTimeout(r, 350 + Math.random() * 300));
     const lang = pickLang(messages);
     const userText = lastUser(messages);

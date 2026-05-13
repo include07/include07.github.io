@@ -69,9 +69,24 @@ Tags use **Simple Icons** by label — see `ICON_SLUGS` in [`src/pages/Editorial
 
 ## Chat backend
 
-The Chat page calls `window.portfolio.ask({ messages })`. Locally that's stubbed by [`src/lib/chat-backend.js`](src/lib/chat-backend.js), which returns canned first-person replies seeded from `content.jsx` so the UI works offline with no API key.
+The Chat page calls `window.portfolio.ask({ messages })`.
 
-**Before deploying**, replace the stub with a fetch to your own proxy:
+- If a Groq key is set locally, it uses **Groq live**.
+- Otherwise it falls back to the local stub in [`src/lib/chat-backend.js`](src/lib/chat-backend.js).
+
+You can set your key directly in the chat UI (stored only in browser localStorage), or from the console:
+
+```js
+window.portfolio.setGroqKey("gsk_...")
+```
+
+To remove it:
+
+```js
+window.portfolio.clearGroqKey()
+```
+
+For production-grade deployment (shared public chat), prefer a backend proxy:
 
 ```js
 // in ChatPortfolio.jsx — swap the window.portfolio.ask call for:

@@ -163,6 +163,8 @@ export default function ChatPortfolio() {
   const [voiceMode, setVoiceMode] = useState(false);
   const [listening, setListening] = useState(false);
   const [speakingIdx, setSpeakingIdx] = useState(-1);
+  const [groqKeyInput, setGroqKeyInput] = useState("");
+  const [chatMode, setChatMode] = useState("local-stub");
   const logRef = useRef(null);
   const recogRef = useRef(null);
 
@@ -190,6 +192,12 @@ export default function ChatPortfolio() {
         window.speechSynthesis.cancel();
       }
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.portfolio?.chatMode) {
+      setChatMode(window.portfolio.chatMode());
+    }
   }, []);
 
   function startListening() {
@@ -230,6 +238,20 @@ export default function ChatPortfolio() {
   const fb = FALLBACK[t.lang] || FALLBACK.en;
   const chips = SUGGESTED[t.lang] || SUGGESTED.en;
 
+  function saveGroqKey() {
+    const key = groqKeyInput.trim();
+    if (!key || !window.portfolio?.setGroqKey) return;
+    window.portfolio.setGroqKey(key);
+    setGroqKeyInput("");
+    setChatMode(window.portfolio.chatMode());
+  }
+
+  function clearGroqKey() {
+    if (!window.portfolio?.clearGroqKey) return;
+    window.portfolio.clearGroqKey();
+    setChatMode(window.portfolio.chatMode());
+  }
+
   async function send(prompt) {
     const text = (prompt ?? input).trim();
     if (!text || thinking) return;
@@ -247,10 +269,7 @@ export default function ChatPortfolio() {
       }));
       const reply = await window.portfolio.ask({
         messages: [
-          { role: "user", content: sys + "\n\n— Conversation begins —" },
-          { role: "assistant", content: t.lang === "fr"
-              ? "Compris. Je réponds en première personne, comme moi-même."
-              : "Got it. I'll answer in first person, as myself." },
+          { role: "system", content: sys },
           ...history,
         ],
       });
@@ -408,6 +427,28 @@ export default function ChatPortfolio() {
               <span className="hint">
                 {speechAvailable() ? head.voiceHint : head.voiceUnavailable}
               </span>
+            </div>
+
+            <div className="voice-row" style={{ marginTop: 8 }}>
+              <span className="hint">
+                {t.lang === "fr" ? "Mode chat" : "Chat mode"}: <b>{chatMode === "groq" ? "Groq live" : "Local stub"}</b>
+              </span>
+            </div>
+
+            <div className="composer" style={{ marginTop: 8 }}>
+              <input
+                type="password"
+                value={groqKeyInput}
+                onChange={(e) => setGroqKeyInput(e.target.value)}
+                placeholder={t.lang === "fr" ? "Coller clé Groq (stockée localement)" : "Paste Groq key (stored locally)"}
+                aria-label="Groq API key"
+              />
+              <button className="send-btn" type="button" onClick={saveGroqKey} disabled={!groqKeyInput.trim()}>
+                {t.lang === "fr" ? "Activer Groq" : "Enable Groq"}
+              </button>
+              <button className="send-btn" type="button" onClick={clearGroqKey}>
+                {t.lang === "fr" ? "Retirer" : "Clear"}
+              </button>
             </div>
           </div>
         </section>
