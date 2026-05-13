@@ -126,33 +126,7 @@ const FALLBACK = {
 
 function SunIcon()   { return (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>); }
 function MoonIcon()  { return (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>); }
-function MicIcon()   { return (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>); }
-function SpeakIcon() { return (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 8a5 5 0 0 1 0 8M19 5a9 9 0 0 1 0 14"/></svg>); }
-function StopIcon()  { return (<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>); }
 
-const SpeechRec = typeof window !== "undefined" ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null;
-function speechAvailable() { return !!SpeechRec && typeof window !== "undefined" && "speechSynthesis" in window; }
-
-function speak(text, lang, onEnd) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-    onEnd && onEnd();
-    return null;
-  }
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = lang === "fr" ? "fr-FR" : "en-US";
-  utter.rate = 1.02;
-  utter.pitch = 1.0;
-  const voices = window.speechSynthesis.getVoices();
-  const wantLang = utter.lang.toLowerCase().slice(0, 2);
-  const candidates = voices.filter((v) => v.lang.toLowerCase().startsWith(wantLang));
-  const male = candidates.find((v) => /male|daniel|alex|fred|thomas|nicolas|guy/i.test(v.name));
-  utter.voice = male || candidates[0] || null;
-  utter.onend = () => onEnd && onEnd();
-  utter.onerror = () => onEnd && onEnd();
-  window.speechSynthesis.speak(utter);
-  return utter;
-}
 
 export default function ChatPortfolio() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
@@ -160,13 +134,9 @@ export default function ChatPortfolio() {
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [highlight, setHighlight] = useState([]);
-  const [voiceMode, setVoiceMode] = useState(false);
-  const [listening, setListening] = useState(false);
-  const [speakingIdx, setSpeakingIdx] = useState(-1);
   const [groqKeyInput, setGroqKeyInput] = useState("");
   const [chatMode, setChatMode] = useState("local-stub");
   const logRef = useRef(null);
-  const recogRef = useRef(null);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -183,56 +153,10 @@ export default function ChatPortfolio() {
   }, [messages, thinking]);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.getVoices();
-      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-    }
-    return () => {
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
     if (typeof window !== "undefined" && window.portfolio?.chatMode) {
       setChatMode(window.portfolio.chatMode());
     }
   }, []);
-
-  function startListening() {
-    if (!SpeechRec) return;
-    if (recogRef.current) { try { recogRef.current.stop(); } catch (_) {} }
-    const r = new SpeechRec();
-    r.lang = t.lang === "fr" ? "fr-FR" : "en-US";
-    r.interimResults = false;
-    r.maxAlternatives = 1;
-    r.continuous = false;
-    r.onresult = (ev) => {
-      const heard = ev.results[0][0].transcript;
-      setListening(false);
-      if (heard && heard.trim()) send(heard.trim());
-    };
-    r.onend = () => setListening(false);
-    r.onerror = () => setListening(false);
-    recogRef.current = r;
-    setListening(true);
-    try { r.start(); } catch (_) { setListening(false); }
-  }
-  function stopListening() {
-    if (recogRef.current) { try { recogRef.current.stop(); } catch (_) {} }
-    setListening(false);
-  }
-
-  function speakMessage(idx, text) {
-    if (speakingIdx === idx) {
-      window.speechSynthesis.cancel();
-      setSpeakingIdx(-1);
-      return;
-    }
-    setSpeakingIdx(idx);
-    speak(text, t.lang, () => setSpeakingIdx(-1));
-  }
 
   const head = HEADING[t.lang] || HEADING.en;
   const fb = FALLBACK[t.lang] || FALLBACK.en;
@@ -276,13 +200,6 @@ export default function ChatPortfolio() {
       const replyText = (reply || "").trim();
       setMessages((m) => [...m, { role: "assistant", text: replyText }]);
       setHighlight((prev) => Array.from(new Set([...prev, ...detectHighlights(replyText)])));
-      if (voiceMode && replyText) {
-        const newIdx = next.length;
-        setTimeout(() => {
-          setSpeakingIdx(newIdx);
-          speak(replyText, t.lang, () => setSpeakingIdx(-1));
-        }, 120);
-      }
     } catch (e) {
       setMessages((m) => [...m, {
         role: "assistant",
@@ -362,16 +279,7 @@ export default function ChatPortfolio() {
                           .replace(/\n/g, "<br/>"),
                       }} />
                     ))}
-                    {m.role === "assistant" && typeof window !== "undefined" && "speechSynthesis" in window && (
-                      <button
-                        className={"speak-btn" + (speakingIdx === i ? " playing" : "")}
-                        onClick={() => speakMessage(i, m.text)}
-                        aria-label={speakingIdx === i ? "Stop" : "Read aloud"}
-                        title={speakingIdx === i ? "Stop" : "Read aloud"}
-                      >
-                        {speakingIdx === i ? <StopIcon /> : <SpeakIcon />}
-                      </button>
-                    )}
+
                   </div>
                 </div>
               ))}
@@ -392,42 +300,16 @@ export default function ChatPortfolio() {
             )}
 
             <form className="composer" onSubmit={(e) => { e.preventDefault(); send(); }}>
-              {SpeechRec && (
-                <button
-                  type="button"
-                  className="mic-btn"
-                  data-listening={listening ? "true" : "false"}
-                  onClick={listening ? stopListening : startListening}
-                  aria-label={listening ? "Stop listening" : "Start voice input"}
-                  title={listening ? (t.lang === "fr" ? "Arrêter" : "Stop") : (t.lang === "fr" ? "Parler" : "Speak")}
-                ><MicIcon /></button>
-              )}
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={listening ? (t.lang === "fr" ? "Écoute…" : "Listening…") : head.placeholder}
+                placeholder={head.placeholder}
                 aria-label="Message"
-                disabled={listening}
               />
               <button className="send-btn" type="submit" disabled={!input.trim() || thinking}>
                 {t.lang === "fr" ? "Envoyer" : "Send"} →
               </button>
             </form>
-
-            <div className="voice-row">
-              <label className="voice-toggle">
-                <input
-                  type="checkbox"
-                  checked={voiceMode}
-                  disabled={!speechAvailable()}
-                  onChange={(e) => setVoiceMode(e.target.checked)}
-                />
-                <b>{head.voiceLabel}</b>
-              </label>
-              <span className="hint">
-                {speechAvailable() ? head.voiceHint : head.voiceUnavailable}
-              </span>
-            </div>
 
             <div className="voice-row" style={{ marginTop: 8 }}>
               <span className="hint">
