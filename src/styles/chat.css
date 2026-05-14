@@ -113,10 +113,10 @@ html[data-dark="true"] .orb img{filter:invert(1) brightness(1.1)}
 }
 .portrait .pixel{width:160px;height:160px;image-rendering:pixelated}
 .portrait .portrait-img{
-  width:160px;
-  height:160px;
-  object-fit:cover;
-  object-position:50% 18%;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:50% 50%;
   image-rendering:pixelated;
 }
 .portrait .pulse{
