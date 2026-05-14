@@ -5,6 +5,5 @@ dist/
 *.log
 
 # Vite build output must never be committed at repo root
-/index.html
 /assets/
 
