@@ -215,8 +215,6 @@ export default function ChatPortfolio() {
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [highlight, setHighlight] = useState([]);
-  const [groqKeyInput, setGroqKeyInput] = useState("");
-  const [chatMode, setChatMode] = useState("local-stub");
   const logRef = useRef(null);
 
   useEffect(() => {
@@ -233,29 +231,9 @@ export default function ChatPortfolio() {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [messages, thinking]);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.portfolio?.chatMode) {
-      setChatMode(window.portfolio.chatMode());
-    }
-  }, []);
-
   const head = HEADING[t.lang] || HEADING.en;
   const fb = FALLBACK[t.lang] || FALLBACK.en;
   const chips = SUGGESTED[t.lang] || SUGGESTED.en;
-
-  function saveGroqKey() {
-    const key = groqKeyInput.trim();
-    if (!key || !window.portfolio?.setGroqKey) return;
-    window.portfolio.setGroqKey(key);
-    setGroqKeyInput("");
-    setChatMode(window.portfolio.chatMode());
-  }
-
-  function clearGroqKey() {
-    if (!window.portfolio?.clearGroqKey) return;
-    window.portfolio.clearGroqKey();
-    setChatMode(window.portfolio.chatMode());
-  }
 
   async function send(prompt) {
     const text = (prompt ?? input).trim();
@@ -466,37 +444,6 @@ export default function ChatPortfolio() {
               </button>
             </form>
 
-            <div className="voice-row" style={{ marginTop: 8 }}>
-              <span className="hint">
-                {t.lang === "fr" ? "Mode chat" : "Chat mode"}:{" "}
-                <b>{chatMode === "groq" ? "Groq live" : "Local stub"}</b>
-              </span>
-            </div>
-
-            <div className="composer" style={{ marginTop: 8 }}>
-              <input
-                type="password"
-                value={groqKeyInput}
-                onChange={(e) => setGroqKeyInput(e.target.value)}
-                placeholder={
-                  t.lang === "fr"
-                    ? "Coller clé Groq (stockée localement)"
-                    : "Paste Groq key (stored locally)"
-                }
-                aria-label="Groq API key"
-              />
-              <button
-                className="send-btn"
-                type="button"
-                onClick={saveGroqKey}
-                disabled={!groqKeyInput.trim()}
-              >
-                {t.lang === "fr" ? "Activer Groq" : "Enable Groq"}
-              </button>
-              <button className="send-btn" type="button" onClick={clearGroqKey}>
-                {t.lang === "fr" ? "Retirer" : "Clear"}
-              </button>
-            </div>
           </div>
         </section>
       </main>
