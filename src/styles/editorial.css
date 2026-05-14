@@ -411,8 +411,7 @@ section:first-of-type{border-top:none}
   transition:transform .2s, border-color .2s;
 }
 .proj:hover{transform:translateY(-2px);border-color:var(--rule)}
-.proj.feat{grid-column:span 12;display:grid;grid-template-columns:1.3fr 1fr;gap:32px;padding:32px}
-.proj.feat .proj-img{order:2}
+.proj.feat{grid-column:span 12;padding:32px}
 .proj-num{
   font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--muted);
@@ -437,21 +436,6 @@ section:first-of-type{border-top:none}
   padding:3px 7px;border:1px solid var(--rule-soft);border-radius:4px;color:var(--ink-2);
   display:inline-flex;align-items:center;gap:6px;
 }
-.proj-img{
-  aspect-ratio: 16/10;border:1px solid var(--rule-soft);border-radius:4px;
-  background:
-    repeating-linear-gradient(135deg, transparent 0 10px, var(--rule-soft) 10px 11px),
-    var(--bg-2);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--muted);
-  position:relative;overflow:hidden;
-}
-.proj-img span{
-  background:var(--paper);padding:4px 10px;border-radius:3px;
-  border:1px solid var(--rule-soft);
-}
-.proj.feat .proj-img{aspect-ratio:auto;min-height:280px}
 .proj-cta{
   margin-top:8px;display:inline-flex;align-items:center;gap:8px;
   font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;

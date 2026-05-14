@@ -236,7 +236,6 @@ export default function EditorialPortfolio() {
             {c.projects.map((p, i) => (
               <article key={i} className={"proj" + (p.feat ? " feat" : "")}>
                 {p.award && <div className="proj-award">★ {p.award}</div>}
-                <div className="proj-img"><span>{p.ph}</span></div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, minWidth: 0 }}>
                   <div className="proj-num"><b>·{p.num}</b> / {t.lang === "fr" ? "Projet" : "Project"}</div>
                   <h3>{p.title}</h3>
