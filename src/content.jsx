@@ -17,10 +17,11 @@ const C = {
     name: { a: "Jalaleddin", b: "El Firqi" },
     lede: (
       <>
-        Final-year engineering student at <em>ENSAM Meknès</em> — I build{" "}
-        <em>machine-learning systems</em> for industrial maintenance and
-        computer vision, and the <em>cloud-native infrastructure</em> that ships
-        them: Kubernetes, GitLab CI, observability.
+        AI / DevOps engineer from <em>ENSAM Meknès</em>. I build{" "}
+        <em>ML systems</em> for industrial maintenance and computer vision
+        (<em>SIANA</em>, <em>AI-Inside</em>) and self-host the{" "}
+        <em>cloud-native infrastructure</em> that ships them (<em>QtoDash</em>{" "}
+        on a 5-VM Kubernetes cluster).
       </>
     ),
     actions: [
@@ -476,11 +477,11 @@ const C = {
     name: { a: "Jalaleddin", b: "El Firqi" },
     lede: (
       <>
-        Élève-ingénieur en dernière année à <em>l'ENSAM Meknès</em> — je conçois
-        des <em>systèmes de machine learning</em> pour la maintenance
-        industrielle et la vision par ordinateur, et{" "}
-        <em>l'infrastructure cloud-native</em> qui les met en production :
-        Kubernetes, GitLab CI, observabilité.
+        Ingénieur IA / DevOps issu de <em>l'ENSAM Meknès</em>. Je conçois des{" "}
+        <em>systèmes ML</em> pour la maintenance industrielle et la vision par
+        ordinateur (<em>SIANA</em>, <em>AI-Inside</em>) et j'auto-héberge{" "}
+        <em>l'infrastructure cloud-native</em> qui les met en production
+        (<em>QtoDash</em> sur un cluster Kubernetes 5 VMs).
       </>
     ),
     actions: [

@@ -4,6 +4,11 @@ dist/
 .DS_Store
 *.log
 
+# Local secrets — never commit
+.groq
+.env.local
+.env*.local
+
 # Vite build output must never be committed at repo root
 /assets/
 
