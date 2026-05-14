@@ -30,6 +30,8 @@ jobs:
               run: bun install --frozen-lockfile
 
             - name: Build site
+              env:
+                  VITE_GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
               run: bun run build
 
             - name: Setup Pages

@@ -59,6 +59,7 @@ function buildSystemPrompt(lang) {
       .join("\n"),
     ``,
     `Rules:`,
+    `- Use only facts present in the CV context below (experience, projects, skills, awards, contact). Do not invent companies, dates, metrics, or technologies.`,
     `- If asked about something not in my background, say so honestly.`,
     `- Always reply in ${lang === "fr" ? "French" : "English"}.`,
     `- For DevOps questions, foreground QtoDash (5-VM cluster: 1 GitLab, 1 NGINX proxy, 3 K8s nodes) and Sawti (Kubernetes-deployed crowdsourcing platform).`,
