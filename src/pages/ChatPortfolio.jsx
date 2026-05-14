@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import C from "../content.jsx";
 import { useTweaks } from "../lib/tweaks.jsx";
-import { Halo, PixelPortrait } from "../components/Halo.jsx";
+import { Halo } from "../components/Halo.jsx";
 import chatCss from "../styles/chat.css?inline";
 
 const TWEAK_DEFAULTS = { lang: "en", dark: false };
@@ -15,16 +15,26 @@ const TWEAK_DEFAULTS = { lang: "en", dark: false };
 function buildSystemPrompt(lang) {
   const c = C[lang] || C.en;
 
-  const expSummary = c.experiences.map((x) =>
-    `- ${x.role} at ${x.co} (${x.coNote}), ${x.when} · ${x.where}. Focus: ${x.focus}. Stack: ${x.stack.join(", ")}.`
-  ).join("\n");
+  const expSummary = c.experiences
+    .map(
+      (x) =>
+        `- ${x.role} at ${x.co} (${x.coNote}), ${x.when} · ${x.where}. Focus: ${x.focus}. Stack: ${x.stack.join(", ")}.`,
+    )
+    .join("\n");
 
-  const projSummary = c.projects.map((p) =>
-    `- ${plainTitle(p.title)} (${p.kind}${p.award ? ", " + p.award : ""}${p.link ? ", " + p.link : ""}). Tags: ${(p.tags || []).join(", ")}.`
-  ).join("\n");
+  const projSummary = c.projects
+    .map(
+      (p) =>
+        `- ${plainTitle(p.title)} (${p.kind}${p.award ? ", " + p.award : ""}${p.link ? ", " + p.link : ""}). Tags: ${(p.tags || []).join(", ")}.`,
+    )
+    .join("\n");
 
-  const skillSummary = c.skills.map((g) => `${g.g}: ${g.items.join(", ")}`).join("\n");
-  const awardSummary = c.awards.map((a) => `${a.rank} ${plainTitle(a.label)} (${a.when})`).join("\n");
+  const skillSummary = c.skills
+    .map((g) => `${g.g}: ${g.items.join(", ")}`)
+    .join("\n");
+  const awardSummary = c.awards
+    .map((a) => `${a.rank} ${plainTitle(a.label)} (${a.when})`)
+    .join("\n");
 
   return [
     `You ARE Jalaleddin El Firqi, a final-year engineering student at ENSAM Meknès specialising in AI/Data Science AND DevOps (Kubernetes, GitLab CI). Reply in the FIRST PERSON ("I built…", "I'm currently…"). Be warm, concise, and concrete — like a senior peer in casual conversation. Never say you are an AI.`,
@@ -44,7 +54,9 @@ function buildSystemPrompt(lang) {
     awardSummary,
     ``,
     `=== CONTACT ===`,
-    Object.values(c.contact.rows).map((r) => `${r.k}: ${r.v}`).join("\n"),
+    Object.values(c.contact.rows)
+      .map((r) => `${r.k}: ${r.v}`)
+      .join("\n"),
     ``,
     `Rules:`,
     `- If asked about something not in my background, say so honestly.`,
@@ -59,31 +71,40 @@ function plainTitle(node) {
   if (node == null) return "";
   if (typeof node === "string" || typeof node === "number") return String(node);
   if (Array.isArray(node)) return node.map(plainTitle).join("");
-  if (node.props && node.props.children != null) return plainTitle(node.props.children);
+  if (node.props && node.props.children != null)
+    return plainTitle(node.props.children);
   return "";
 }
 
 const HIGHLIGHT_KEYWORDS = {
-  kubernetes:   ["kubernetes","k8s","kubectl","helm","cluster","ingress","hpa"],
-  gitlab:       ["gitlab","ci/cd","pipeline","runner"],
-  docker:       ["docker","container","compose","dockerfile"],
-  nginx:        ["nginx","reverse proxy","proxy","tls"],
-  terraform:    ["terraform","iac","infrastructure as code"],
-  prometheus:   ["prometheus","metrics","alert"],
-  grafana:      ["grafana","dashboard","observability"],
-  linux:        ["linux","ubuntu","debian","systemd"],
-  python:       ["python","pandas","numpy","sklearn"],
-  pytorch:      ["pytorch","torch","neural","deep learning"],
-  react:        ["react","frontend","jsx","tsx"],
-  django:       ["django","drf","rest framework"],
-  postgresql:   ["postgres","postgresql","sql","database"],
-  apachekafka:  ["kafka","stream"],
-  apachespark:  ["spark","streaming","pyspark"],
-  nvidia:       ["nvidia","triton","cuda","gpu"],
-  opencv:       ["opencv","cv2","image processing"],
-  raspberrypi:  ["raspberry","pi","edge"],
-  minio:        ["minio","s3","object store"],
-  huggingface:  ["hugging face","huggingface","transformer","hf"],
+  kubernetes: [
+    "kubernetes",
+    "k8s",
+    "kubectl",
+    "helm",
+    "cluster",
+    "ingress",
+    "hpa",
+  ],
+  gitlab: ["gitlab", "ci/cd", "pipeline", "runner"],
+  docker: ["docker", "container", "compose", "dockerfile"],
+  nginx: ["nginx", "reverse proxy", "proxy", "tls"],
+  terraform: ["terraform", "iac", "infrastructure as code"],
+  prometheus: ["prometheus", "metrics", "alert"],
+  grafana: ["grafana", "dashboard", "observability"],
+  linux: ["linux", "ubuntu", "debian", "systemd"],
+  python: ["python", "pandas", "numpy", "sklearn"],
+  pytorch: ["pytorch", "torch", "neural", "deep learning"],
+  react: ["react", "frontend", "jsx", "tsx"],
+  django: ["django", "drf", "rest framework"],
+  postgresql: ["postgres", "postgresql", "sql", "database"],
+  apachekafka: ["kafka", "stream"],
+  apachespark: ["spark", "streaming", "pyspark"],
+  nvidia: ["nvidia", "triton", "cuda", "gpu"],
+  opencv: ["opencv", "cv2", "image processing"],
+  raspberrypi: ["raspberry", "pi", "edge"],
+  minio: ["minio", "s3", "object store"],
+  huggingface: ["hugging face", "huggingface", "transformer", "hf"],
 };
 
 function detectHighlights(text) {
@@ -115,18 +136,86 @@ const SUGGESTED = {
 };
 
 const HEADING = {
-  en: { eyebrow: "Live · Talk to my portfolio", h1: <>Ask me <em>anything.</em></>, sub: "This page is me, in conversation. Hit a chip below or type a question — I'll answer in real time. The orbiting icons highlight when I mention a tool I use.", placeholder: "Ask about projects, infra, AI, availability…", voiceLabel: "Voice mode", voiceHint: "Hold the mic to speak; I'll read replies aloud.", voiceUnavailable: "Voice not supported by this browser — try Chrome / Edge." },
-  fr: { eyebrow: "En direct · Parlez à mon portfolio", h1: <>Demandez-moi <em>n'importe quoi.</em></>, sub: "Cette page, c'est moi en conversation. Choisissez une suggestion ou tapez une question — je réponds en direct. Les icônes en orbite s'illuminent quand je mentionne un outil.", placeholder: "Projets, infra, IA, disponibilité…", voiceLabel: "Mode vocal", voiceHint: "Cliquez le micro pour parler ; je lirai mes réponses à voix haute.", voiceUnavailable: "Voix non supportée par ce navigateur — essayez Chrome / Edge." },
+  en: {
+    eyebrow: "Live · Talk to my portfolio",
+    h1: (
+      <>
+        Ask me <em>anything.</em>
+      </>
+    ),
+    sub: "This page is me, in conversation. Hit a chip below or type a question — I'll answer in real time. The orbiting icons highlight when I mention a tool I use.",
+    placeholder: "Ask about projects, infra, AI, availability…",
+    voiceLabel: "Voice mode",
+    voiceHint: "Hold the mic to speak; I'll read replies aloud.",
+    voiceUnavailable:
+      "Voice not supported by this browser — try Chrome / Edge.",
+  },
+  fr: {
+    eyebrow: "En direct · Parlez à mon portfolio",
+    h1: (
+      <>
+        Demandez-moi <em>n'importe quoi.</em>
+      </>
+    ),
+    sub: "Cette page, c'est moi en conversation. Choisissez une suggestion ou tapez une question — je réponds en direct. Les icônes en orbite s'illuminent quand je mentionne un outil.",
+    placeholder: "Projets, infra, IA, disponibilité…",
+    voiceLabel: "Mode vocal",
+    voiceHint:
+      "Cliquez le micro pour parler ; je lirai mes réponses à voix haute.",
+    voiceUnavailable:
+      "Voix non supportée par ce navigateur — essayez Chrome / Edge.",
+  },
 };
 
 const FALLBACK = {
-  en: { h: <>Prefer the <em>full editorial</em> portfolio?</>, p: "If chat isn't your thing, the long-form version has every project, role, award and skill laid out the traditional way.", cta: "Open the editorial portfolio →" },
-  fr: { h: <>Vous préférez la version <em>éditoriale</em> ?</>, p: "Si le chat n'est pas votre truc, la version classique détaille tous les projets, postes, distinctions et compétences.", cta: "Ouvrir le portfolio éditorial →" },
+  en: {
+    h: (
+      <>
+        Prefer the <em>full editorial</em> portfolio?
+      </>
+    ),
+    p: "If chat isn't your thing, the long-form version has every project, role, award and skill laid out the traditional way.",
+    cta: "Open the editorial portfolio →",
+  },
+  fr: {
+    h: (
+      <>
+        Vous préférez la version <em>éditoriale</em> ?
+      </>
+    ),
+    p: "Si le chat n'est pas votre truc, la version classique détaille tous les projets, postes, distinctions et compétences.",
+    cta: "Ouvrir le portfolio éditorial →",
+  },
 };
 
-function SunIcon()   { return (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>); }
-function MoonIcon()  { return (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>); }
-
+function SunIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4" />
+    </svg>
+  );
+}
+function MoonIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" />
+    </svg>
+  );
+}
 
 export default function ChatPortfolio() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
@@ -192,21 +281,24 @@ export default function ChatPortfolio() {
         content: m.text,
       }));
       const reply = await window.portfolio.ask({
-        messages: [
-          { role: "system", content: sys },
-          ...history,
-        ],
+        messages: [{ role: "system", content: sys }, ...history],
       });
       const replyText = (reply || "").trim();
       setMessages((m) => [...m, { role: "assistant", text: replyText }]);
-      setHighlight((prev) => Array.from(new Set([...prev, ...detectHighlights(replyText)])));
+      setHighlight((prev) =>
+        Array.from(new Set([...prev, ...detectHighlights(replyText)])),
+      );
     } catch (e) {
-      setMessages((m) => [...m, {
-        role: "assistant",
-        text: t.lang === "fr"
-          ? "Désolé, j'ai eu un souci pour répondre. Réessayez ?"
-          : "Sorry — I hit a snag answering that. Try again?",
-      }]);
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          text:
+            t.lang === "fr"
+              ? "Désolé, j'ai eu un souci pour répondre. Réessayez ?"
+              : "Sorry — I hit a snag answering that. Try again?",
+        },
+      ]);
     } finally {
       setThinking(false);
     }
@@ -216,27 +308,58 @@ export default function ChatPortfolio() {
     <>
       <style>{chatCss}</style>
       <header className="topbar" data-screen-label="00 Chat hero">
-        <div className="brand"><b>J·EF</b> / Chat Portfolio · 26</div>
+        <div className="brand">
+          <b>J·EF</b> / Chat Portfolio · 26
+        </div>
         <div className="topbar-right">
-          <Link to="/editorial" className="brand"
-                style={{ textDecoration: "underline", textDecorationColor: "var(--rule)", textUnderlineOffset: 4 }}>
+          <Link
+            to="/editorial"
+            className="brand"
+            style={{
+              textDecoration: "underline",
+              textDecorationColor: "var(--rule)",
+              textUnderlineOffset: 4,
+            }}
+          >
             {t.lang === "fr" ? "Version éditoriale" : "Editorial version"}
           </Link>
           <div className="seg" role="tablist" aria-label="Language">
-            <button aria-pressed={t.lang === "en"} onClick={() => setTweak("lang", "en")}>EN</button>
-            <button aria-pressed={t.lang === "fr"} onClick={() => setTweak("lang", "fr")}>FR</button>
+            <button
+              aria-pressed={t.lang === "en"}
+              onClick={() => setTweak("lang", "en")}
+            >
+              EN
+            </button>
+            <button
+              aria-pressed={t.lang === "fr"}
+              onClick={() => setTweak("lang", "fr")}
+            >
+              FR
+            </button>
           </div>
-          <button className="icon-btn" onClick={() => setTweak("dark", !t.dark)} aria-label="Toggle theme">
+          <button
+            className="icon-btn"
+            onClick={() => setTweak("dark", !t.dark)}
+            aria-label="Toggle theme"
+          >
             {t.dark ? <SunIcon /> : <MoonIcon />}
           </button>
         </div>
       </header>
 
       <div className="status-strip">
-        <span><b>STATUS</b> Available · Aug 2026</span>
-        <span><b>ROLE</b> AI · DevOps engineer</span>
-        <span><b>BASED IN</b> Meknès · MA</span>
-        <span><b>BUILT</b> 2026 · v1</span>
+        <span>
+          <b>STATUS</b> Available · Aug 2026
+        </span>
+        <span>
+          <b>ROLE</b> AI · DevOps engineer
+        </span>
+        <span>
+          <b>BASED IN</b> Meknès · MA
+        </span>
+        <span>
+          <b>BUILT</b> 2026 · v1
+        </span>
       </div>
 
       <main className="stage">
@@ -244,13 +367,14 @@ export default function ChatPortfolio() {
           <Halo thinking={thinking} highlight={highlight} />
           <div className="portrait" data-thinking={thinking ? "true" : "false"}>
             <div className="pulse"></div>
-            <PixelPortrait />
+            <img className="portrait-img" src="/pixelised.png" alt="Jalaleddin pixel portrait" />
           </div>
         </div>
 
         <section className="chat-col">
           <div className="chat-eyebrow">
-            <span className="live-dot"></span>{head.eyebrow}
+            <span className="live-dot"></span>
+            {head.eyebrow}
           </div>
           <h1 className="chat-h1">{head.h1}</h1>
           <p className="chat-sub">{head.sub}</p>
@@ -261,32 +385,59 @@ export default function ChatPortfolio() {
                 <div className="msg bot">
                   <div className="who">JF</div>
                   <div className="body">
-                    {t.lang === "fr"
-                      ? <>Salut 👋 — je suis Jalaleddin. Pose-moi une question sur mes projets, mon stack, ou ce que je cherche pour 2026.</>
-                      : <>Hey 👋 — I'm Jalaleddin. Ask me anything about my projects, my stack, or what I'm looking for in 2026.</>}
+                    {t.lang === "fr" ? (
+                      <>
+                        Salut 👋 — je suis Jalaleddin. Pose-moi une question sur
+                        mes projets, mon stack, ou ce que je cherche pour 2026.
+                      </>
+                    ) : (
+                      <>
+                        Hey 👋 — I'm Jalaleddin. Ask me anything about my
+                        projects, my stack, or what I'm looking for in 2026.
+                      </>
+                    )}
                   </div>
                 </div>
               )}
               {messages.map((m, i) => (
-                <div key={i} className={"msg " + (m.role === "user" ? "you" : "bot")}>
-                  <div className="who">{m.role === "user" ? (t.lang === "fr" ? "VS" : "YOU") : "JF"}</div>
+                <div
+                  key={i}
+                  className={"msg " + (m.role === "user" ? "you" : "bot")}
+                >
+                  <div className="who">
+                    {m.role === "user"
+                      ? t.lang === "fr"
+                        ? "VS"
+                        : "YOU"
+                      : "JF"}
+                  </div>
                   <div className="body">
                     {m.text.split(/\n\n+/).map((para, j) => (
-                      <p key={j} dangerouslySetInnerHTML={{
-                        __html: para
-                          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                          .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-                          .replace(/\n/g, "<br/>"),
-                      }} />
+                      <p
+                        key={j}
+                        dangerouslySetInnerHTML={{
+                          __html: para
+                            .replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+                            .replace(/\n/g, "<br/>"),
+                        }}
+                      />
                     ))}
-
                   </div>
                 </div>
               ))}
               {thinking && (
                 <div className="msg bot">
                   <div className="who">JF</div>
-                  <div className="body"><span className="typing"><span></span><span></span><span></span></span></div>
+                  <div className="body">
+                    <span className="typing">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
@@ -294,26 +445,39 @@ export default function ChatPortfolio() {
             {messages.length === 0 && (
               <div className="suggested">
                 {chips.map((q) => (
-                  <button key={q} className="chip" onClick={() => send(q)}>{q}</button>
+                  <button key={q} className="chip" onClick={() => send(q)}>
+                    {q}
+                  </button>
                 ))}
               </div>
             )}
 
-            <form className="composer" onSubmit={(e) => { e.preventDefault(); send(); }}>
+            <form
+              className="composer"
+              onSubmit={(e) => {
+                e.preventDefault();
+                send();
+              }}
+            >
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={head.placeholder}
                 aria-label="Message"
               />
-              <button className="send-btn" type="submit" disabled={!input.trim() || thinking}>
+              <button
+                className="send-btn"
+                type="submit"
+                disabled={!input.trim() || thinking}
+              >
                 {t.lang === "fr" ? "Envoyer" : "Send"} →
               </button>
             </form>
 
             <div className="voice-row" style={{ marginTop: 8 }}>
               <span className="hint">
-                {t.lang === "fr" ? "Mode chat" : "Chat mode"}: <b>{chatMode === "groq" ? "Groq live" : "Local stub"}</b>
+                {t.lang === "fr" ? "Mode chat" : "Chat mode"}:{" "}
+                <b>{chatMode === "groq" ? "Groq live" : "Local stub"}</b>
               </span>
             </div>
 
@@ -322,10 +486,19 @@ export default function ChatPortfolio() {
                 type="password"
                 value={groqKeyInput}
                 onChange={(e) => setGroqKeyInput(e.target.value)}
-                placeholder={t.lang === "fr" ? "Coller clé Groq (stockée localement)" : "Paste Groq key (stored locally)"}
+                placeholder={
+                  t.lang === "fr"
+                    ? "Coller clé Groq (stockée localement)"
+                    : "Paste Groq key (stored locally)"
+                }
                 aria-label="Groq API key"
               />
-              <button className="send-btn" type="button" onClick={saveGroqKey} disabled={!groqKeyInput.trim()}>
+              <button
+                className="send-btn"
+                type="button"
+                onClick={saveGroqKey}
+                disabled={!groqKeyInput.trim()}
+              >
                 {t.lang === "fr" ? "Activer Groq" : "Enable Groq"}
               </button>
               <button className="send-btn" type="button" onClick={clearGroqKey}>
@@ -339,7 +512,9 @@ export default function ChatPortfolio() {
       <section className="fallback">
         <h2>{fb.h}</h2>
         <p>{fb.p}</p>
-        <Link className="cta" to="/editorial">{fb.cta}</Link>
+        <Link className="cta" to="/editorial">
+          {fb.cta}
+        </Link>
       </section>
     </>
   );

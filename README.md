@@ -77,13 +77,13 @@ The Chat page calls `window.portfolio.ask({ messages })`.
 You can set your key directly in the chat UI (stored only in browser localStorage), or from the console:
 
 ```js
-window.portfolio.setGroqKey("gsk_...")
+window.portfolio.setGroqKey("gsk_...");
 ```
 
 To remove it:
 
 ```js
-window.portfolio.clearGroqKey()
+window.portfolio.clearGroqKey();
 ```
 
 For production-grade deployment (shared public chat), prefer a backend proxy:

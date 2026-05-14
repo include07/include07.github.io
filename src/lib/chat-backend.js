@@ -14,7 +14,9 @@ const GROQ_MODEL = "llama-3.3-70b-versatile";
 const LS_KEY = "portfolio.groq.apiKey";
 
 function pickLang(messages) {
-  const sys = messages.find((m) => /Always reply in (French|English)/i.test(m.content || ""));
+  const sys = messages.find((m) =>
+    /Always reply in (French|English)/i.test(m.content || ""),
+  );
   if (sys && /French/i.test(sys.content)) return "fr";
   return "en";
 }
@@ -79,15 +81,19 @@ function route(text, lang) {
   if (/qtodash|qto-dash|qto dash/.test(lo)) return t.qtodash();
   if (/sawti|darija/.test(lo)) return t.sawti();
   if (/siana|tgv|axle|essieu/.test(lo)) return t.siana();
-  if (/ai-?inside|yolo|qc management|defect|défaut/.test(lo)) return t.aiInside();
+  if (/ai-?inside|yolo|qc management|defect|défaut/.test(lo))
+    return t.aiInside();
   if (/devops|kubernetes|k8s|gitlab|infra|cluster/.test(lo)) return t.devops();
   if (/(why|pourquoi).*(ai|ia|devops|ml)/.test(lo)) return t.why();
   if (/strong(est)?|best|meilleur|favori/.test(lo)) return t.strongest();
-  if (/(available|hire|hiring|disponib|emploi|recru)/.test(lo)) return t.available();
+  if (/(available|hire|hiring|disponib|emploi|recru)/.test(lo))
+    return t.available();
   if (/^(hi|hey|hello|salut|bonjour|coucou)/.test(lo)) {
     return lang === "fr"
-      ? "Salut ! Posez-moi une question — projets, infra, IA, dispo. " + t.fallback()
-      : "Hey! Ask me anything — projects, infra, AI, availability. " + t.fallback();
+      ? "Salut ! Posez-moi une question — projets, infra, IA, dispo. " +
+          t.fallback()
+      : "Hey! Ask me anything — projects, infra, AI, availability. " +
+          t.fallback();
   }
   if (/\b(ai|ml|machine learning|ia|apprentissage)\b/.test(lo)) return t.ai();
   return t.fallback();
@@ -96,7 +102,11 @@ function route(text, lang) {
 function getGroqKey() {
   if (typeof window === "undefined") return "";
   const ls = window.localStorage.getItem(LS_KEY) || "";
-  const env = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_GROQ_API_KEY) || "";
+  const env =
+    (typeof import.meta !== "undefined" &&
+      import.meta.env &&
+      import.meta.env.VITE_GROQ_API_KEY) ||
+    "";
   return (ls || env || "").trim();
 }
 
@@ -105,7 +115,7 @@ async function askGroq(messages, apiKey) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model: GROQ_MODEL,
@@ -152,11 +162,7 @@ export function installChatBackend() {
     const apiKey = getGroqKey();
 
     if (apiKey) {
-      try {
-        return await askGroq(messages, apiKey);
-      } catch (_) {
-        // Fall back gracefully if key is invalid/rate-limited.
-      }
+      return await askGroq(messages, apiKey);
     }
 
     await new Promise((r) => setTimeout(r, 350 + Math.random() * 300));
