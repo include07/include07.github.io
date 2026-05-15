@@ -124,20 +124,16 @@ function detectHighlights(text) {
 
 const SUGGESTED = {
   en: [
-    "What's your strongest project?",
-    "Tell me about QtoDash.",
-    "Show me your DevOps work.",
-    "Are you available for hire?",
-    "Why AI + DevOps?",
     "What did you build at SIANA?",
+    "Tell me about QtoDash.",
+    "Walk me through your stack.",
+    "Are you available for hire?",
   ],
   fr: [
-    "Quel est votre meilleur projet ?",
-    "Parle-moi de QtoDash.",
-    "Tes projets DevOps ?",
-    "Es-tu disponible pour un poste ?",
-    "Pourquoi IA + DevOps ?",
     "Qu'as-tu fait chez SIANA ?",
+    "Parle-moi de QtoDash.",
+    "Présente-moi ton stack.",
+    "Es-tu disponible pour un poste ?",
   ],
 };
 
@@ -287,16 +283,9 @@ export default function ChatPortfolio() {
           <b>J·EF</b> / Chat Portfolio · 26
         </div>
         <div className="topbar-right">
-          <Link
-            to="/editorial"
-            className="brand"
-            style={{
-              textDecoration: "underline",
-              textDecorationColor: "var(--rule)",
-              textUnderlineOffset: 4,
-            }}
-          >
+          <Link to="/editorial" className="editorial-btn">
             {t.lang === "fr" ? "Version éditoriale" : "Editorial version"}
+            <span className="arr">↗</span>
           </Link>
           <div className="seg" role="tablist" aria-label="Language">
             <button
@@ -327,10 +316,10 @@ export default function ChatPortfolio() {
           <b>STATUS</b> Available · Aug 2026
         </span>
         <span>
-          <b>ROLE</b> AI · DevOps engineer
+          <b>ROLE</b> AI · Full-Stack engineer
         </span>
         <span>
-          <b>BASED IN</b> Meknès · MA
+          <b>BASED IN</b> Tangier · MA
         </span>
         <span>
           <b>BUILT</b> 2026 · v1
@@ -352,28 +341,10 @@ export default function ChatPortfolio() {
             {head.eyebrow}
           </div>
           <h1 className="chat-h1">{head.h1}</h1>
-          <p className="chat-sub">{head.sub}</p>
 
           <div className="chat-shell">
+            {(messages.length > 0 || thinking) && (
             <div className="chat-log" ref={logRef}>
-              {messages.length === 0 && (
-                <div className="msg bot">
-                  <div className="who">JF</div>
-                  <div className="body">
-                    {t.lang === "fr" ? (
-                      <>
-                        Salut 👋 — je suis Jalaleddin. Pose-moi une question sur
-                        mes projets, mon stack, ou ce que je cherche pour 2026.
-                      </>
-                    ) : (
-                      <>
-                        Hey 👋 — I'm Jalaleddin. Ask me anything about my
-                        projects, my stack, or what I'm looking for in 2026.
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
               {messages.map((m, i) => (
                 <div
                   key={i}
@@ -416,6 +387,7 @@ export default function ChatPortfolio() {
                 </div>
               )}
             </div>
+            )}
 
             {messages.length === 0 && (
               <div className="suggested">

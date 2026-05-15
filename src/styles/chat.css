@@ -35,6 +35,15 @@ a{color:inherit}
   padding:5px 12px;border-radius:999px;cursor:pointer;color:var(--muted);
 }
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.editorial-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  padding:6px 12px;border:1px solid var(--ink);border-radius:999px;
+  color:var(--ink);background:var(--paper);text-decoration:none;
+  transition:background .15s, color .15s;
+}
+.editorial-btn:hover{background:var(--ink);color:var(--bg)}
+.editorial-btn .arr{font-family:var(--display);font-style:italic;font-size:13px;text-transform:none;letter-spacing:0}
 .icon-btn{
   appearance:none;border:1px solid var(--rule);background:var(--paper);
   width:32px;height:32px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;
