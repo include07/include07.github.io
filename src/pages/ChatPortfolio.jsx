@@ -73,6 +73,19 @@ function buildSystemPrompt(lang) {
   ].join("\n");
 }
 
+function ShellPrompt() {
+  return (
+    <span className="shell-prompt" aria-hidden="true">
+      <span className="u">you</span>
+      <span className="at">@</span>
+      <span className="h">portfolio</span>
+      <span className="colon">:</span>
+      <span className="p">~</span>
+      <span className="dollar">$</span>
+    </span>
+  );
+}
+
 function plainTitle(node) {
   if (node == null) return "";
   if (typeof node === "string" || typeof node === "number") return String(node);
@@ -380,7 +393,7 @@ export default function ChatPortfolio() {
                     key={i}
                     className={"msg " + (m.role === "user" ? "you" : "bot")}
                   >
-                    <div className="prompt">{m.role === "user" ? "$" : "›"}</div>
+                    {m.role === "user" && <ShellPrompt />}
                     <div className="body">
                       {m.text.split(/\n\n+/).map((para, j, arr) => (
                         <p
@@ -405,7 +418,6 @@ export default function ChatPortfolio() {
               })}
               {thinking && (
                 <div className="msg bot">
-                  <div className="prompt">›</div>
                   <div className="body">
                     <span className="typing">
                       <span></span>
@@ -435,7 +447,7 @@ export default function ChatPortfolio() {
                 send();
               }}
             >
-              <span className="composer-prompt" aria-hidden="true">$</span>
+              <ShellPrompt />
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
