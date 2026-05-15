@@ -253,6 +253,14 @@ export default function ChatPortfolio() {
     const text = (prompt ?? input).trim();
     if (!text || thinking) return;
     setInput("");
+
+    // Built-in shell commands (handled locally, never sent to the model).
+    if (/^(clear|cls)$/i.test(text)) {
+      setMessages([]);
+      setHighlight([]);
+      return;
+    }
+
     const next = [...messages, { role: "user", text }];
     setMessages(next);
     setThinking(true);
@@ -451,6 +459,14 @@ export default function ChatPortfolio() {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "l") {
+                    e.preventDefault();
+                    setMessages([]);
+                    setHighlight([]);
+                    setInput("");
+                  }
+                }}
                 placeholder={head.placeholder}
                 aria-label="Message"
               />
