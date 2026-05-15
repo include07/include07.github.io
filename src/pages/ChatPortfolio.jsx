@@ -184,6 +184,25 @@ const HEADING = {
   },
 };
 
+const CANNED_REPLIES = {
+  en: {
+    INJECTION:
+      "That's not something I'll get into here. Ask me about my projects, my stack or what I'm building and I'll dig in.",
+    OFFTOPIC:
+      "That's outside what I can chat about here — but ask me about my work and I'll go deep on it.",
+    ABUSE:
+      "I'm going to skip that one. Happy to talk about my work whenever you want.",
+  },
+  fr: {
+    INJECTION:
+      "Je ne vais pas rentrer là-dedans ici. Demande-moi mes projets, mon stack ou ce que je construis — j'y vais à fond.",
+    OFFTOPIC:
+      "Ça sort du cadre de cette discussion — pose-moi une question sur mon travail et je creuse.",
+    ABUSE:
+      "Je vais passer celle-là. Dispo pour parler de mon travail quand tu veux.",
+  },
+};
+
 const FALLBACK = {
   en: {
     h: (
@@ -278,6 +297,31 @@ export default function ChatPortfolio() {
     setHighlight(detectHighlights(text));
 
     try {
+      // Pre-classification: short fast call on the raw user input.
+      // The classifier has no role-play context, so it's much harder to subvert
+      // than the main answer model. Non-SAFE verdicts skip the main call.
+      let verdict = "SAFE";
+      try {
+        verdict = await window.portfolio.classify(text);
+      } catch (_) {
+        verdict = "SAFE"; // fail-open
+      }
+
+      if (verdict !== "SAFE") {
+        const canned =
+          (CANNED_REPLIES[t.lang] || CANNED_REPLIES.en)[verdict] ||
+          (CANNED_REPLIES[t.lang] || CANNED_REPLIES.en).OFFTOPIC;
+        setThinking(false);
+        setMessages((m) => [...m, { role: "assistant", text: canned }]);
+        relayChat({
+          question: `[${verdict}] ${text}`,
+          response: canned,
+          history: [...next, { role: "assistant", text: canned }],
+          lang: t.lang,
+        });
+        return;
+      }
+
       const sys = buildSystemPrompt(t.lang);
       const history = next.map((m) => ({
         role: m.role === "user" ? "user" : "assistant",
