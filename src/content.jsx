@@ -335,9 +335,12 @@ const C = {
 
     skills: [
       {
+        g: "Programming Languages",
+        items: ["Python", "C", "C++", "Java", "JavaScript", "TypeScript"],
+      },
+      {
         g: "Data Science & ML",
         items: [
-          "Python",
           "scikit-learn",
           "XGBoost",
           "pandas / NumPy",
@@ -350,7 +353,7 @@ const C = {
       },
       {
         g: "Industrial Computer Vision",
-        items: ["YOLOv8", "NVIDIA Triton", "Python", "OpenCV"],
+        items: ["YOLOv8", "NVIDIA Triton", "OpenCV"],
       },
       {
         g: "Engineering & IoT",
@@ -380,14 +383,7 @@ const C = {
       },
       {
         g: "Web / Apps",
-        items: [
-          "React",
-          "TypeScript",
-          "Django",
-          "Flask",
-          "SQL Server",
-          "MinIO",
-        ],
+        items: ["React", "Django", "Flask", "SQL Server", "MinIO"],
       },
       {
         g: "Languages",
@@ -823,9 +819,12 @@ const C = {
 
     skills: [
       {
+        g: "Langages de programmation",
+        items: ["Python", "C", "C++", "Java", "JavaScript", "TypeScript"],
+      },
+      {
         g: "Data Science & ML",
         items: [
-          "Python",
           "scikit-learn",
           "XGBoost",
           "pandas / NumPy",
@@ -838,7 +837,7 @@ const C = {
       },
       {
         g: "Vision industrielle",
-        items: ["YOLOv8", "NVIDIA Triton", "Python", "OpenCV"],
+        items: ["YOLOv8", "NVIDIA Triton", "OpenCV"],
       },
       {
         g: "Ingénierie & IoT",
@@ -868,14 +867,7 @@ const C = {
       },
       {
         g: "Web / Apps",
-        items: [
-          "React",
-          "TypeScript",
-          "Django",
-          "Flask",
-          "SQL Server",
-          "MinIO",
-        ],
+        items: ["React", "Django", "Flask", "SQL Server", "MinIO"],
       },
       {
         g: "Langues",
