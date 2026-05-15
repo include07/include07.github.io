@@ -92,7 +92,11 @@ a{color:inherit}
   transition:transform .25s, border-color .25s, background .25s;
   text-decoration:none;
   box-shadow:0 4px 14px -8px rgba(0,0,0,.25);
+  /* button reset */
+  font:inherit;padding:0;-webkit-appearance:none;appearance:none;
 }
+button.orb{appearance:none}
+.orb[data-hot="true"]{border-color:var(--accent);background:var(--bg)}
 .orb:hover{transform:scale(1.18);border-color:var(--accent);background:var(--bg)}
 .orb img{width:28px;height:28px;object-fit:contain}
 .orb .tip{

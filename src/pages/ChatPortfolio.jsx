@@ -439,7 +439,18 @@ export default function ChatPortfolio() {
 
       <main className="stage">
         <div className="halo-col">
-          <Halo thinking={thinking} highlight={highlight} />
+          <Halo
+            thinking={thinking}
+            highlight={highlight}
+            lang={t.lang}
+            onTechClick={(project) => {
+              const prompt =
+                t.lang === "fr"
+                  ? `Parle-moi de ${project}.`
+                  : `Tell me about ${project}.`;
+              send(prompt);
+            }}
+          />
           <div className="portrait" data-thinking={thinking ? "true" : "false"}>
             <div className="pulse"></div>
             <img className="portrait-img" src="/pixelised.png" alt="Jalaleddin pixel portrait" />
