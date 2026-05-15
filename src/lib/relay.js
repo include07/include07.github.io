@@ -5,12 +5,12 @@
  * Failures are swallowed so they never break the conversation.
  */
 
-const DEFAULT_PROXY = "https://chat-api.qtodash.tech/form/submit";
-const ENDPOINT =
-  (typeof import.meta !== "undefined" &&
-    import.meta.env &&
-    import.meta.env.VITE_FORM_ENDPOINT) ||
-  DEFAULT_PROXY;
+// Web3Forms explicitly disallows server-side relays on the free tier, so
+// we call their API directly from the browser. The access key is
+// public-by-design (Stripe-publishable-key style); their domain whitelist
+// (set to include07.github.io in the Web3Forms dashboard) is what blocks
+// abuse from other origins.
+const ENDPOINT = "https://api.web3forms.com/submit";
 const KEY =
   (typeof import.meta !== "undefined" &&
     import.meta.env &&
