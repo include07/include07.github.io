@@ -443,11 +443,11 @@ export default function ChatPortfolio() {
             thinking={thinking}
             highlight={highlight}
             lang={t.lang}
-            onTechClick={(project) => {
+            onTechClick={(project, tech) => {
               const prompt =
                 t.lang === "fr"
-                  ? `Parle-moi de ${project}.`
-                  : `Tell me about ${project}.`;
+                  ? `Comment utilises-tu ${tech} dans ${project} ?`
+                  : `How do you use ${tech} in ${project}?`;
               send(prompt);
             }}
           />
