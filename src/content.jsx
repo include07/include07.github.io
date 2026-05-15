@@ -12,16 +12,17 @@ const C = {
     mark: "J·EF / Portfolio · 26",
     location: "Meknès, Morocco",
     available: "Available · Aug 2026",
-    role: "AI · DevOps Engineer",
-    field: "ML platforms · Kubernetes · GitLab",
+    role: "AI · Full-Stack Engineer",
+    field: "ML · Full-stack · End-to-end delivery",
     name: { a: "Jalaleddin", b: "El Firqi" },
     lede: (
       <>
-        AI / DevOps engineer from <em>ENSAM Meknès</em>. I build{" "}
-        <em>ML systems</em> for industrial maintenance and computer vision
-        (<em>SIANA</em>, <em>AI-Inside</em>) and self-host the{" "}
-        <em>cloud-native infrastructure</em> that ships them (<em>QtoDash</em>{" "}
-        on a 5-VM Kubernetes cluster).
+        AI & full-stack engineer from <em>ENSAM Meknès</em>. I deliver{" "}
+        <em>industrial software end-to-end</em> — from needs analysis to
+        deployment — building <em>ML systems</em> for predictive maintenance
+        and computer vision (<em>SIANA</em>, <em>AI-Inside</em>) and the web
+        platforms that put them in operators' hands (<em>SI-ESSIEUX</em>,{" "}
+        <em>QC Management System</em>, <em>QtoDash</em>).
       </>
     ),
     actions: [
@@ -41,11 +42,11 @@ const C = {
       "Docker",
       "YOLOv8",
       "NVIDIA Triton",
-      "Terraform",
-      "Spark / Kafka",
-      "Grounding DINO",
+      "scikit-learn",
+      "XGBoost",
+      "Django",
+      "React",
       "Anomaly detection",
-      "Prometheus + Grafana",
       "MLOps",
     ],
 
@@ -122,9 +123,10 @@ const C = {
             operation entry, maintenance decision and history.
           </>,
           <>
-            Implemented an <b>automated RUL training pipeline</b>, from data
-            preparation to re-training, to improve maintenance decision
-            reliability.
+            Implemented an <b>automated RUL training pipeline</b>{" "}
+            (survival analysis & gradient boosting on inspection-interval
+            data), from data preparation to re-training, to improve maintenance
+            decision reliability.
           </>,
           <>
             Prepared test/acceptance and progressive deployment (double entry),
@@ -140,11 +142,12 @@ const C = {
           "React",
           "SQL Server",
           "Python",
-          "PyTorch",
+          "scikit-learn",
+          "GitLab CI",
           "BPMN",
           "UML",
         ],
-        kStack: ["Python", "PyTorch"],
+        kStack: ["Python", "GitLab"],
       },
       {
         co: "AI-Inside",
@@ -169,8 +172,9 @@ const C = {
             MinIO).
           </>,
           <>
-            Cut <b>data-prep time by 50%</b> with a custom image-annotation app
-            tailored to the team's workflow.
+            Streamlined the team's data-prep workflow with a{" "}
+            <b>custom image-annotation app</b> tailored to their labelling
+            conventions.
           </>,
           <>
             Tuned YOLOv8 detectors against real production imagery; iterated on
@@ -178,7 +182,7 @@ const C = {
           </>,
         ],
         metrics: [
-          { v: "-50%", l: "Data-preparation time" },
+          { v: "Custom", l: "Annotation tooling" },
           { v: "YOLOv8", l: "Production defect detection" },
         ],
         stack: ["YOLOv8", "Docker", "Flask", "React", "PostgreSQL", "MinIO"],
@@ -223,14 +227,15 @@ const C = {
         feat: true,
         num: "01",
         kind: "Personal infrastructure project · in progress",
-        award: "Live",
+        award: "Shipping",
         link: "qtodash.tech",
+        image: "/projects/qtodash.png",
         title: (
           <>
             Qto<span className="it">Dash</span> — voice‑powered AI dashboards.
           </>
         ),
-        body: "Voice‑first analytics platform that turns spoken business questions into instant dashboards. End‑to‑end self‑hosted on a 5‑VM cluster: 1 GitLab CI/CD node, 1 NGINX reverse proxy, and a 3‑node Kubernetes cluster orchestrating the API, ASR worker and dashboard renderer.",
+        body: "Voice‑first analytics platform that turns spoken business questions into instant dashboards. Early text‑mode build is live at app.qtodash.tech while I bring up the full target architecture: end‑to‑end self‑hosted on a 5‑VM cluster — 1 GitLab CI/CD node, 1 NGINX reverse proxy, and a 3‑node Kubernetes cluster orchestrating the API, ASR worker and dashboard renderer.",
         infra: [
           { k: "GitLab", v: "CI/CD · registry · IaC" },
           { k: "Reverse proxy", v: "NGINX · TLS · routing" },
@@ -252,16 +257,17 @@ const C = {
       {
         feat: true,
         num: "02",
-        kind: "ENSAM × ENSIAS · sawti.dev",
+        kind: "Backend engineering · Sawti (ASR data platform)",
         link: "sawti.dev",
+        image: "/projects/sawti.png",
         title: (
           <>
-            Sawti — first <span className="it">Darija</span> voice dataset.
+            Sawti — crowdsourced <span className="it">Darija</span> voice corpus.
           </>
         ),
-        body: "Crowdsourced platform building a Moroccan-Darija speech dataset for ASR research. Built with React frontend, Flask API and PostgreSQL, with structured collection of voice and text contributions.",
+        body: "Backend engineer on a crowdsourced platform building a Moroccan-Darija speech corpus for ASR research. Designed and shipped the Flask API and PostgreSQL schema powering contribution flows, with structured collection of voice and text submissions across regions.",
         infra: [
-          { k: "Contributions", v: "465 voices · 619 texts" },
+          { k: "Scale", v: "465 recordings · 619 texts" },
           { k: "Coverage", v: "1.6h recorded · 3 regions" },
           { k: "Stack", v: "React · Flask · PostgreSQL" },
         ],
@@ -270,14 +276,15 @@ const C = {
       },
       {
         num: "03",
-        kind: "ENSAM × SIANA (ONCF/SNCF)",
+        kind: "ENSAM × SIANA (ONCF/SNCF) · team project · project manager",
         award: "1st place",
+        image: "/projects/robot.jpg",
         title: (
           <>
             Smart <span className="it">inspection</span> robot.
           </>
         ),
-        body: "An autonomous prototype that detects rail defects in real time via on-device YOLOv8 on a Raspberry Pi — full mechanical, electrical and embedded design.",
+        body: "Team project (project manager + member) — an autonomous prototype that detects rail defects in real time via on-device YOLOv8 on a Raspberry Pi. Full mechanical, electrical and embedded design across the team.",
         tags: [
           "YOLOv8",
           "Raspberry Pi",
@@ -289,25 +296,26 @@ const C = {
       },
       {
         num: "04",
-        kind: "Academic · ENSAM Meknès",
+        kind: "Academic · ENSAM Meknès · team project",
         title: (
           <>
             Turbo-fan <span className="it">predictive</span> maintenance.
           </>
         ),
-        body: "RUL estimation on a multi-sensor turbofan dataset; feature engineering on time series and head-to-head comparison of classical ML against neural-network baselines.",
+        body: "RUL estimation on NASA's C-MAPSS multi-sensor turbofan dataset; feature engineering on time series and head-to-head comparison of classical ML against LSTM baselines.",
         tags: ["Time series", "PyTorch", "Feature eng."],
         ph: "sensor traces",
       },
       {
         num: "05",
         kind: "Industrial vision pipeline · ENSAM",
+        image: "/projects/segma.png",
         title: (
           <>
             SegmaVision<span className="it">Pro</span>.
           </>
         ),
-        body: "Language-guided segmentation pipeline (Grounding DINO) deployed on NVIDIA Triton with batched post-processing for production-grade latency.",
+        body: "Language-guided segmentation pipeline (Grounding DINO) served on NVIDIA Triton with batched post-processing to keep inference latency low.",
         tags: ["Grounding DINO", "NVIDIA Triton", "OpenCV"],
         ph: "segmentation diagram",
       },
@@ -319,8 +327,8 @@ const C = {
             Personal voice <span className="it">clone</span>.
           </>
         ),
-        body: "Fine-tuning an open-source TTS model on my own voice recordings to power the spoken-portfolio agent on this very page — used as the voice layer of the conversational interface.",
-        tags: ["PyTorch", "Python", "YOLOv8"],
+        body: "Fine-tuning Coqui XTTS-v2 on my own voice recordings to power the spoken-portfolio agent on this very page — the voice layer of the conversational interface.",
+        tags: ["Coqui XTTS-v2", "PyTorch", "Python", "TTS", "Voice cloning"],
         ph: "waveform · voice fine-tune",
       },
     ],
@@ -330,40 +338,57 @@ const C = {
         g: "Data Science & ML",
         items: [
           "Python",
+          "scikit-learn",
+          "XGBoost",
+          "pandas / NumPy",
           "PyTorch",
+          "MLflow",
           "Time series",
           "Predictive maintenance",
           "Anomaly detection",
-          "NLP",
         ],
       },
       {
         g: "Industrial Computer Vision",
-        items: [
-          "YOLOv8",
-          "NVIDIA Triton",
-          "Python",
-          "Grounding DINO",
-          "OpenCV",
-        ],
+        items: ["YOLOv8", "NVIDIA Triton", "Python", "OpenCV"],
       },
       {
         g: "Engineering & IoT",
-        items: ["AutoCAD Electrical", "Raspberry Pi", "Embedded prototyping"],
+        items: [
+          "AutoCAD Electrical",
+          "Raspberry Pi",
+          "SolidWorks",
+          "Fusion 360",
+          "Embedded prototyping (sensors · hardware integration)",
+        ],
       },
       {
         g: "Industrialisation & MLOps",
         items: [
           "Docker",
-          "PostgreSQL",
+          "Kubernetes",
+          "NGINX",
+          "CI/CD",
+          "GitLab",
+          "Git",
+          "Bash",
           "Linux",
-          "Spark / Kafka",
+          "PostgreSQL",
           "Prometheus",
           "Grafana",
-          "GitLab",
         ],
       },
-      { g: "Web / Apps", items: ["React", "Django", "Flask", "MinIO"] },
+      {
+        g: "Web / Apps",
+        items: [
+          "React",
+          "TypeScript",
+          "Django",
+          "Flask",
+          "SQL Server",
+          "MinIO",
+        ],
+      },
       {
         g: "Languages",
         items: ["Arabic — native", "French — TCF C2", "English — TOEFL C1"],
@@ -394,19 +419,10 @@ const C = {
         rank: "2ⁿᵈ",
         label: (
           <>
-            National Data Science Competition — <em>EMINES</em>
+            NDSC · Voice Privacy Challenge — <em>EMINES</em>
           </>
         ),
         when: "Feb 2025",
-      },
-      {
-        rank: "·",
-        label: (
-          <>
-            Voice Privacy Challenge 2025 — <em>contributor (VPC25)</em>
-          </>
-        ),
-        when: "2025",
       },
       {
         rank: "5ᵗʰ",
@@ -436,6 +452,11 @@ const C = {
         where: "ENSAM Meknès · Morocco",
       },
       {
+        when: "2019 — 2020",
+        h: "EIDIA — Math & Computer Science (prep year)",
+        where: "UEMF (Université Euromed de Fès) · Morocco",
+      },
+      {
         when: "2018 — 2019",
         h: "Baccalauréat — Sciences Physiques",
         where: "Lycée Moulay Bouchaïb · Azemmour",
@@ -448,12 +469,13 @@ const C = {
           Let's <em>build</em> something.
         </>
       ),
-      lede: "Open to first full-time roles in AI/ML and DevOps — Kubernetes, GitLab CI, ML platforms — starting August 2026.",
+      lede: "Open to first full-time roles in AI/ML and full-stack engineering — end-to-end industrial software, from ML to product — starting August 2026.",
       rows: [
         { k: "Email", v: "j.elfirqi@gmail.com" },
         { k: "Phone", v: "+212 675 832 110" },
-        { k: "Location", v: "Meknès, Morocco" },
+        { k: "Location", v: "Tangier, Morocco · open to relocation" },
         { k: "GitHub", v: "github.com/include07" },
+        { k: "LinkedIn", v: "linkedin.com/in/<handle-pending>" },
       ],
     },
     footer: ["© 2026 Jalaleddin El Firqi", "Designed & built in Meknès"],
@@ -472,16 +494,18 @@ const C = {
     mark: "J·EF / Portfolio · 26",
     location: "Meknès, Maroc",
     available: "Disponible · Août 2026",
-    role: "Ingénieur IA · DevOps",
-    field: "Plateformes ML · Kubernetes · GitLab",
+    role: "Ingénieur IA · Full-Stack",
+    field: "ML · Full-stack · Livraison de bout en bout",
     name: { a: "Jalaleddin", b: "El Firqi" },
     lede: (
       <>
-        Ingénieur IA / DevOps issu de <em>l'ENSAM Meknès</em>. Je conçois des{" "}
-        <em>systèmes ML</em> pour la maintenance industrielle et la vision par
-        ordinateur (<em>SIANA</em>, <em>AI-Inside</em>) et j'auto-héberge{" "}
-        <em>l'infrastructure cloud-native</em> qui les met en production
-        (<em>QtoDash</em> sur un cluster Kubernetes 5 VMs).
+        Ingénieur IA & full-stack issu de <em>l'ENSAM Meknès</em>. Je livre
+        des <em>logiciels industriels de bout en bout</em> — de l'analyse du
+        besoin au déploiement — en concevant des <em>systèmes ML</em> pour la
+        maintenance prédictive et la vision (<em>SIANA</em>,{" "}
+        <em>AI-Inside</em>) et les plateformes web qui les mettent dans les
+        mains des opérateurs (<em>SI-ESSIEUX</em>,{" "}
+        <em>QC Management System</em>, <em>QtoDash</em>).
       </>
     ),
     actions: [
@@ -501,11 +525,11 @@ const C = {
       "Docker",
       "YOLOv8",
       "NVIDIA Triton",
-      "Terraform",
-      "Spark / Kafka",
-      "Grounding DINO",
+      "scikit-learn",
+      "XGBoost",
+      "Django",
+      "React",
       "Détection d'anomalies",
-      "Prometheus + Grafana",
       "MLOps",
     ],
 
@@ -583,7 +607,8 @@ const C = {
             saisie d'opérations, décision de maintenance et historique.
           </>,
           <>
-            Mise en place d'un <b>pipeline d'entraînement automatique RUL</b>,
+            Mise en place d'un <b>pipeline d'entraînement automatique RUL</b>{" "}
+            (analyse de survie & gradient boosting sur données d'inspection),
             de la préparation des données au réentraînement des modèles.
           </>,
           <>
@@ -600,11 +625,12 @@ const C = {
           "React",
           "SQL Server",
           "Python",
-          "PyTorch",
+          "scikit-learn",
+          "GitLab CI",
           "BPMN",
           "UML",
         ],
-        kStack: ["Python", "PyTorch"],
+        kStack: ["Python", "GitLab"],
       },
       {
         co: "AI-Inside",
@@ -631,8 +657,9 @@ const C = {
             PostgreSQL · MinIO).
           </>,
           <>
-            Réduction de <b>50% du temps de préparation des données</b> grâce à
-            une application d'annotation sur mesure.
+            Rationalisation du workflow de préparation des données via une{" "}
+            <b>application d'annotation sur mesure</b>, alignée sur les
+            conventions de labellisation de l'équipe.
           </>,
           <>
             Optimisation des détecteurs YOLOv8 sur images de production ;
@@ -640,7 +667,7 @@ const C = {
           </>,
         ],
         metrics: [
-          { v: "-50%", l: "Temps de préparation des données" },
+          { v: "Sur mesure", l: "Outillage d'annotation" },
           { v: "YOLOv8", l: "Détection de défauts en prod" },
         ],
         stack: ["YOLOv8", "Docker", "Flask", "React", "PostgreSQL", "MinIO"],
@@ -686,15 +713,16 @@ const C = {
         feat: true,
         num: "01",
         kind: "Projet d'infrastructure personnel · en cours",
-        award: "En ligne",
+        award: "En cours",
         link: "qtodash.tech",
+        image: "/projects/qtodash.png",
         title: (
           <>
             Qto<span className="it">Dash</span> — tableaux de bord IA pilotés à
             la voix.
           </>
         ),
-        body: "Plateforme analytique voice‑first qui transforme une question parlée en tableau de bord instantané. Auto‑hébergée de bout en bout sur un cluster de 5 VMs : 1 nœud GitLab CI/CD, 1 reverse proxy NGINX et un cluster Kubernetes à 3 nœuds qui orchestre l'API, le worker ASR et le rendu des dashboards.",
+        body: "Plateforme analytique voice‑first qui transforme une question parlée en tableau de bord instantané. Une première version texte est en ligne sur app.qtodash.tech pendant que je monte l'architecture cible : auto‑hébergée de bout en bout sur un cluster de 5 VMs — 1 nœud GitLab CI/CD, 1 reverse proxy NGINX et un cluster Kubernetes à 3 nœuds qui orchestre l'API, le worker ASR et le rendu des dashboards.",
         infra: [
           { k: "GitLab", v: "CI/CD · registry · IaC" },
           { k: "Reverse proxy", v: "NGINX · TLS · routage" },
@@ -716,16 +744,18 @@ const C = {
       {
         feat: true,
         num: "02",
-        kind: "ENSAM × ENSIAS · sawti.dev",
+        kind: "Backend engineering · Sawti (plateforme de données ASR)",
         link: "sawti.dev",
+        image: "/projects/sawti.png",
         title: (
           <>
-            Sawti — premier dataset vocal en <span className="it">Darija</span>.
+            Sawti — corpus vocal participatif en{" "}
+            <span className="it">Darija</span>.
           </>
         ),
-        body: "Plateforme participative de collecte de données vocales en darija marocaine pour la recherche ASR. Réalisée avec React, Flask et PostgreSQL, avec structuration des contributions voix et textes.",
+        body: "Ingénieur backend sur une plateforme participative de collecte de données vocales en darija marocaine pour la recherche ASR. Conception et livraison de l'API Flask et du schéma PostgreSQL alimentant les flux de contribution voix et textes à travers plusieurs régions.",
         infra: [
-          { k: "Contributions", v: "465 voix · 619 textes" },
+          { k: "Volume", v: "465 enregistrements · 619 textes" },
           { k: "Couverture", v: "1,6h enregistrée · 3 régions" },
           { k: "Stack", v: "React · Flask · PostgreSQL" },
         ],
@@ -734,14 +764,15 @@ const C = {
       },
       {
         num: "03",
-        kind: "ENSAM × SIANA (ONCF/SNCF)",
+        kind: "ENSAM × SIANA (ONCF/SNCF) · projet d'équipe · chef de projet",
         award: "1ʳᵉ place",
+        image: "/projects/robot.jpg",
         title: (
           <>
             Robot d'<span className="it">inspection</span> intelligente.
           </>
         ),
-        body: "Prototype autonome détectant les défauts en temps réel par YOLOv8 embarqué sur Raspberry Pi — conception mécanique, électrique et embarquée complète.",
+        body: "Projet d'équipe (chef de projet + membre) — prototype autonome détectant les défauts en temps réel par YOLOv8 embarqué sur Raspberry Pi. Conception mécanique, électrique et embarquée portée collectivement par l'équipe.",
         tags: [
           "YOLOv8",
           "Raspberry Pi",
@@ -753,25 +784,26 @@ const C = {
       },
       {
         num: "04",
-        kind: "Académique · ENSAM Meknès",
+        kind: "Académique · ENSAM Meknès · projet d'équipe",
         title: (
           <>
             Maintenance <span className="it">prédictive</span> Turbo-Fan.
           </>
         ),
-        body: "Estimation du RUL sur un jeu multi-capteurs ; feature engineering sur séries temporelles et comparaison ML classique vs réseaux de neurones.",
+        body: "Estimation du RUL sur le jeu C-MAPSS multi-capteurs de la NASA ; feature engineering sur séries temporelles et comparaison ML classique vs baselines LSTM.",
         tags: ["Séries temp.", "PyTorch", "Feature eng."],
         ph: "courbes capteurs",
       },
       {
         num: "05",
         kind: "Pipeline de vision industrielle · ENSAM",
+        image: "/projects/segma.png",
         title: (
           <>
             SegmaVision<span className="it">Pro</span>.
           </>
         ),
-        body: "Pipeline de segmentation guidée par le langage (Grounding DINO) déployé sur NVIDIA Triton avec post-traitement batché pour une latence de production.",
+        body: "Pipeline de segmentation guidée par le langage (Grounding DINO) servi sur NVIDIA Triton avec post-traitement batché pour maintenir une latence d'inférence basse.",
         tags: ["Grounding DINO", "NVIDIA Triton", "OpenCV"],
         ph: "schéma segmentation",
       },
@@ -783,8 +815,8 @@ const C = {
             Clone <span className="it">vocal</span> personnel.
           </>
         ),
-        body: "Fine-tuning d'un modèle TTS open-source sur mes propres enregistrements pour alimenter l'agent conversationnel de cette page — la couche vocale de l'interface.",
-        tags: ["PyTorch", "Python", "YOLOv8"],
+        body: "Fine-tuning de Coqui XTTS-v2 sur mes propres enregistrements pour alimenter l'agent conversationnel de cette page — la couche vocale de l'interface.",
+        tags: ["Coqui XTTS-v2", "PyTorch", "Python", "TTS", "Clonage vocal"],
         ph: "forme d'onde · fine-tune voix",
       },
     ],
@@ -794,40 +826,57 @@ const C = {
         g: "Data Science & ML",
         items: [
           "Python",
+          "scikit-learn",
+          "XGBoost",
+          "pandas / NumPy",
           "PyTorch",
+          "MLflow",
           "Séries temporelles",
           "Maintenance prédictive",
           "Détection d'anomalies",
-          "NLP",
         ],
       },
       {
         g: "Vision industrielle",
-        items: [
-          "YOLOv8",
-          "NVIDIA Triton",
-          "Python",
-          "Grounding DINO",
-          "OpenCV",
-        ],
+        items: ["YOLOv8", "NVIDIA Triton", "Python", "OpenCV"],
       },
       {
         g: "Ingénierie & IoT",
-        items: ["AutoCAD Electrical", "Raspberry Pi", "Prototypage embarqué"],
+        items: [
+          "AutoCAD Electrical",
+          "Raspberry Pi",
+          "SolidWorks",
+          "Fusion 360",
+          "Prototypage embarqué (capteurs · intégration matérielle)",
+        ],
       },
       {
         g: "Industrialisation & MLOps",
         items: [
           "Docker",
-          "PostgreSQL",
+          "Kubernetes",
+          "NGINX",
+          "CI/CD",
+          "GitLab",
+          "Git",
+          "Bash",
           "Linux",
-          "Spark / Kafka",
+          "PostgreSQL",
           "Prometheus",
           "Grafana",
-          "GitLab",
         ],
       },
-      { g: "Web / Apps", items: ["React", "Django", "Flask", "MinIO"] },
+      {
+        g: "Web / Apps",
+        items: [
+          "React",
+          "TypeScript",
+          "Django",
+          "Flask",
+          "SQL Server",
+          "MinIO",
+        ],
+      },
       {
         g: "Langues",
         items: ["Arabe — natif", "Français — TCF C2", "Anglais — TOEFL C1"],
@@ -858,19 +907,10 @@ const C = {
         rank: "2ᵉ",
         label: (
           <>
-            National Data Science Competition — <em>EMINES</em>
+            NDSC · Voice Privacy Challenge — <em>EMINES</em>
           </>
         ),
         when: "Fév 2025",
-      },
-      {
-        rank: "·",
-        label: (
-          <>
-            Voice Privacy Challenge 2025 — <em>contributeur (VPC25)</em>
-          </>
-        ),
-        when: "2025",
       },
       {
         rank: "5ᵉ",
@@ -900,6 +940,11 @@ const C = {
         where: "ENSAM Meknès · Maroc",
       },
       {
+        when: "2019 — 2020",
+        h: "EIDIA — Mathématiques & Informatique (année préparatoire)",
+        where: "UEMF (Université Euromed de Fès) · Maroc",
+      },
+      {
         when: "2018 — 2019",
         h: "Baccalauréat — Sciences Physiques",
         where: "Lycée Moulay Bouchaïb · Azemmour",
@@ -912,12 +957,13 @@ const C = {
           Construisons <em>quelque chose.</em>
         </>
       ),
-      lede: "Ouvert à un premier emploi en IA/ML et DevOps — Kubernetes, GitLab CI, plateformes ML — à partir d'août 2026.",
+      lede: "Ouvert à un premier emploi en IA/ML et full-stack — logiciels industriels de bout en bout, du ML au produit — à partir d'août 2026.",
       rows: [
         { k: "Email", v: "j.elfirqi@gmail.com" },
         { k: "Téléphone", v: "+212 675 832 110" },
-        { k: "Lieu", v: "Meknès, Maroc" },
+        { k: "Lieu", v: "Tanger, Maroc · ouvert à la mobilité" },
         { k: "GitHub", v: "github.com/include07" },
+        { k: "LinkedIn", v: "linkedin.com/in/<handle-à-fournir>" },
       ],
     },
     footer: ["© 2026 Jalaleddin El Firqi", "Conçu & développé à Meknès"],

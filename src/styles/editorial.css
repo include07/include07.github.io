@@ -447,7 +447,14 @@ section:first-of-type{border-top:none}
   font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;
   text-transform:uppercase;padding:4px 8px;
   background:var(--accent);color:#fff;border-radius:3px;font-weight:600;
+  z-index:1;
 }
+.proj-image{
+  display:block;width:100%;aspect-ratio:16/9;object-fit:cover;
+  border:1px solid var(--rule-soft);border-radius:5px;
+  background:var(--bg-2);
+}
+.proj.feat .proj-image{aspect-ratio:21/9}
 
 /* Tech icons (Simple Icons) */
 .tech-ico{
