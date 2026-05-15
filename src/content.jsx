@@ -278,7 +278,7 @@ const C = {
         num: "03",
         kind: "ENSAM × SIANA (ONCF/SNCF) · team project · project manager",
         award: "1st place",
-        image: "/projects/robot.jpg",
+        image: "/projects/robot.jpeg",
         title: (
           <>
             Smart <span className="it">inspection</span> robot.
@@ -766,7 +766,7 @@ const C = {
         num: "03",
         kind: "ENSAM × SIANA (ONCF/SNCF) · projet d'équipe · chef de projet",
         award: "1ʳᵉ place",
-        image: "/projects/robot.jpg",
+        image: "/projects/robot.jpeg",
         title: (
           <>
             Robot d'<span className="it">inspection</span> intelligente.
