@@ -6,6 +6,7 @@ dist/
 
 # Local secrets — never commit
 .groq
+.web3forms
 .env.local
 .env*.local
 
