@@ -251,11 +251,38 @@ export default function ChatPortfolio() {
         role: m.role === "user" ? "user" : "assistant",
         content: m.text,
       }));
-      const reply = await window.portfolio.ask({
+
+      let placeholderAdded = false;
+      const reply = await window.portfolio.askStream({
         messages: [{ role: "system", content: sys }, ...history],
+        onChunk: (_delta, full) => {
+          if (!placeholderAdded) {
+            placeholderAdded = true;
+            setThinking(false);
+            setMessages((m) => [...m, { role: "assistant", text: full, streaming: true }]);
+          } else {
+            setMessages((m) => {
+              const copy = m.slice();
+              const last = copy[copy.length - 1];
+              if (last && last.role === "assistant") {
+                copy[copy.length - 1] = { ...last, text: full };
+              }
+              return copy;
+            });
+          }
+        },
       });
       const replyText = (reply || "").trim();
-      setMessages((m) => [...m, { role: "assistant", text: replyText }]);
+      setMessages((m) => {
+        const copy = m.slice();
+        const last = copy[copy.length - 1];
+        if (last && last.role === "assistant") {
+          copy[copy.length - 1] = { role: "assistant", text: replyText };
+        } else {
+          copy.push({ role: "assistant", text: replyText });
+        }
+        return copy;
+      });
       setHighlight((prev) =>
         Array.from(new Set([...prev, ...detectHighlights(replyText)])),
       );
@@ -345,38 +372,40 @@ export default function ChatPortfolio() {
           <div className="chat-shell">
             {(messages.length > 0 || thinking) && (
             <div className="chat-log" ref={logRef}>
-              {messages.map((m, i) => (
-                <div
-                  key={i}
-                  className={"msg " + (m.role === "user" ? "you" : "bot")}
-                >
-                  <div className="who">
-                    {m.role === "user"
-                      ? t.lang === "fr"
-                        ? "VS"
-                        : "YOU"
-                      : "JF"}
+              {messages.map((m, i) => {
+                const isLast = i === messages.length - 1;
+                const isStreaming = m.role === "assistant" && isLast && m.streaming;
+                return (
+                  <div
+                    key={i}
+                    className={"msg " + (m.role === "user" ? "you" : "bot")}
+                  >
+                    <div className="prompt">{m.role === "user" ? "$" : "›"}</div>
+                    <div className="body">
+                      {m.text.split(/\n\n+/).map((para, j, arr) => (
+                        <p
+                          key={j}
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              para
+                                .replace(/&/g, "&amp;")
+                                .replace(/</g, "&lt;")
+                                .replace(/>/g, "&gt;")
+                                .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+                                .replace(/\n/g, "<br/>") +
+                              (isStreaming && j === arr.length - 1
+                                ? '<span class="caret"></span>'
+                                : ""),
+                          }}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <div className="body">
-                    {m.text.split(/\n\n+/).map((para, j) => (
-                      <p
-                        key={j}
-                        dangerouslySetInnerHTML={{
-                          __html: para
-                            .replace(/&/g, "&amp;")
-                            .replace(/</g, "&lt;")
-                            .replace(/>/g, "&gt;")
-                            .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-                            .replace(/\n/g, "<br/>"),
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
               {thinking && (
                 <div className="msg bot">
-                  <div className="who">JF</div>
+                  <div className="prompt">›</div>
                   <div className="body">
                     <span className="typing">
                       <span></span>
@@ -406,6 +435,7 @@ export default function ChatPortfolio() {
                 send();
               }}
             >
+              <span className="composer-prompt" aria-hidden="true">$</span>
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
