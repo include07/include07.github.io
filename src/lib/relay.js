@@ -5,7 +5,12 @@
  * Failures are swallowed so they never break the conversation.
  */
 
-const ENDPOINT = "https://api.web3forms.com/submit";
+const DEFAULT_PROXY = "https://chat-api.qtodash.tech/form/submit";
+const ENDPOINT =
+  (typeof import.meta !== "undefined" &&
+    import.meta.env &&
+    import.meta.env.VITE_FORM_ENDPOINT) ||
+  DEFAULT_PROXY;
 const KEY =
   (typeof import.meta !== "undefined" &&
     import.meta.env &&

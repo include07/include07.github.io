@@ -1,0 +1,128 @@
+# /etc/nginx/sites-available/chat-api.qtodash.tech
+# Reverse proxy that fronts Groq with a server-held API key.
+# The browser never sees the key.
+
+# HTTP → HTTPS
+server {
+    listen 80;
+    listen [::]:80;
+    server_name chat-api.qtodash.tech;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name chat-api.qtodash.tech;
+
+    ssl_certificate     /etc/letsencrypt/live/chat-api.qtodash.tech/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/chat-api.qtodash.tech/privkey.pem;
+
+    # Load the Groq auth header from a root-readable include.
+    # That file contains:   set $groq_auth "Bearer gsk_NEWKEY";
+    include /etc/nginx/snippets/groq-key.conf;
+
+    # ─── CORS allow-list (computed at server scope) ──────────
+    set $allow_origin "";
+    if ($http_origin = "https://include07.github.io") { set $allow_origin $http_origin; }
+    if ($http_origin = "http://localhost:5173")       { set $allow_origin $http_origin; }
+
+    # ─── Groq proxy ───────────────────────────────────────────
+    location = /v1/chat/completions {
+        if ($allow_origin = "") { return 403; }
+
+        # Preflight (inside location: add_header here is legal)
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin  $allow_origin always;
+            add_header Access-Control-Allow-Methods "POST, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "Content-Type" always;
+            add_header Access-Control-Max-Age       86400 always;
+            add_header Content-Length 0 always;
+            add_header Content-Type   "text/plain" always;
+            return 204;
+        }
+
+        if ($request_method != POST) { return 405; }
+
+        # Rate limit per IP — 1 r/s sustained, burst of 5.
+        limit_req zone=chat_api burst=5 nodelay;
+        limit_req_status 429;
+
+        # Streaming SSE: don't buffer, don't compress.
+        proxy_buffering    off;
+        proxy_cache        off;
+        gzip               off;
+        proxy_http_version 1.1;
+        proxy_set_header   Connection "";
+        proxy_read_timeout 120s;
+
+        # Replace any client-supplied auth with ours.
+        proxy_set_header Authorization  $groq_auth;
+        proxy_set_header Content-Type   "application/json";
+        proxy_set_header Host           "api.groq.com";
+
+        # Strip headers that could leak origin info upstream.
+        proxy_set_header Origin   "";
+        proxy_set_header Referer  "";
+        proxy_set_header X-Real-IP        $remote_addr;
+        proxy_set_header X-Forwarded-For  $proxy_add_x_forwarded_for;
+
+        # Upstream TLS / SNI — Cloudflare-fronted hosts reject handshakes
+        # without SNI, manifesting as a 502 here.
+        proxy_ssl_server_name on;
+        proxy_ssl_name        api.groq.com;
+        proxy_ssl_protocols   TLSv1.2 TLSv1.3;
+        resolver              1.1.1.1 8.8.8.8 valid=300s;
+        resolver_timeout      5s;
+
+        proxy_pass https://api.groq.com/openai/v1/chat/completions;
+
+        add_header Access-Control-Allow-Origin $allow_origin always;
+        add_header Vary "Origin" always;
+    }
+
+    # ─── Web3Forms relay ─────────────────────────────────────
+    location = /form/submit {
+        if ($allow_origin = "") { return 403; }
+
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin  $allow_origin always;
+            add_header Access-Control-Allow-Methods "POST, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "Content-Type" always;
+            add_header Access-Control-Max-Age       86400 always;
+            add_header Content-Length 0 always;
+            add_header Content-Type   "text/plain" always;
+            return 204;
+        }
+
+        if ($request_method != POST) { return 405; }
+
+        limit_req zone=chat_api burst=3 nodelay;
+        limit_req_status 429;
+
+        proxy_buffering    off;
+        proxy_http_version 1.1;
+        proxy_set_header   Connection "";
+        proxy_read_timeout 30s;
+
+        proxy_set_header Host    "api.web3forms.com";
+        proxy_set_header Origin  "";
+        proxy_set_header Referer "";
+        proxy_set_header X-Real-IP        $remote_addr;
+        proxy_set_header X-Forwarded-For  $proxy_add_x_forwarded_for;
+
+        proxy_ssl_server_name on;
+        proxy_ssl_name        api.web3forms.com;
+        proxy_ssl_protocols   TLSv1.2 TLSv1.3;
+        resolver              1.1.1.1 8.8.8.8 valid=300s;
+        resolver_timeout      5s;
+
+        proxy_pass https://api.web3forms.com/submit;
+
+        add_header Access-Control-Allow-Origin $allow_origin always;
+        add_header Vary "Origin" always;
+    }
+
+    # Anything else → 404
+    location / { return 404; }
+}

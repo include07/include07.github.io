@@ -1,0 +1,7 @@
+# /etc/nginx/snippets/groq-key.conf
+# Root-readable only (chmod 600). Holds the rotated Groq API key.
+# Lives in snippets/ (not conf.d/) so NGINX only loads it where we
+# explicitly `include` it — `set` is illegal at http{} scope.
+# This file is NEVER committed to git — see .gitignore in repo root.
+
+set $groq_auth "Bearer gsk_REPLACE_WITH_ROTATED_KEY";

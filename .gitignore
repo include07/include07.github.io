@@ -6,9 +6,11 @@ dist/
 
 # Local secrets — never commit
 .groq
+.groq*
 .web3forms
 .env.local
 .env*.local
+ops/proxy-1/groq-key.conf
 
 # Vite build output must never be committed at repo root
 /assets/
