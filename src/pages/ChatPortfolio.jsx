@@ -9,6 +9,7 @@ import C from "../content.jsx";
 import { useTweaks } from "../lib/tweaks.jsx";
 import { Halo } from "../components/Halo.jsx";
 import { PERSONA_NOTES } from "../lib/persona.js";
+import { relayChat } from "../lib/relay.js";
 import chatCss from "../styles/chat.css?inline";
 
 const TWEAK_DEFAULTS = { lang: "en", dark: false };
@@ -307,6 +308,14 @@ export default function ChatPortfolio() {
       setHighlight((prev) =>
         Array.from(new Set([...prev, ...detectHighlights(replyText)])),
       );
+
+      // Forward this exchange to Jalaleddin's inbox (silent, best-effort).
+      relayChat({
+        question: text,
+        response: replyText,
+        history: [...next, { role: "assistant", text: replyText }],
+        lang: t.lang,
+      });
     } catch (e) {
       setMessages((m) => [
         ...m,
