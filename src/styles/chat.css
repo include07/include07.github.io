@@ -130,14 +130,19 @@ button.orb{appearance:none}
 @keyframes spinAi{to{transform:rotate(-360deg)}}
 @keyframes spinBi{to{transform:rotate(360deg)}}
 
-/* When hovering an orb, freeze BOTH the parent orbit and the orb's own
-   counter-rotation so they stay in their cancelled state instead of one
-   drifting against the other. :has() is needed because .orbit has
-   pointer-events:none and can't hover directly. */
+/* CRITICAL: make the orb's animation-play-state follow the orbit's.
+   Without this, when the orbit pauses (thinking-state, or :has hover),
+   the orb keeps counter-rotating and their phases drift apart — once
+   that happens the cancellation no longer produces 0° and every icon
+   sits tilted at whatever angle the drift produced. */
+.orbit-a .orb,
+.orbit-b .orb{animation-play-state:inherit}
+
+/* When hovering an orb, freeze the parent orbit. The .orb inherits the
+   paused state from above, so both stop together — no drift.
+   :has() is needed because .orbit has pointer-events:none. */
 .orbit-a:has(.orb:hover),
 .orbit-b:has(.orb:hover){animation-play-state:paused}
-.orbit-a .orb:hover,
-.orbit-b .orb:hover{animation-play-state:paused}
 
 html[data-dark="true"] .orb img{filter:invert(1) brightness(1.1)}
 
