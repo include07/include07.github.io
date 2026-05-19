@@ -9,9 +9,11 @@ dist/
 .groq*
 .newkey
 .web3forms
+.elevenlabs
 .env.local
 .env*.local
 ops/proxy-1/groq-key.conf
+ops/proxy-1/elevenlabs-key.conf
 
 # Vite build output must never be committed at repo root
 /assets/

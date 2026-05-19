@@ -18,9 +18,17 @@ server {
     ssl_certificate     /etc/letsencrypt/live/chat-api.qtodash.tech/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/chat-api.qtodash.tech/privkey.pem;
 
-    # Load the Groq auth header from a root-readable include.
-    # That file contains:   set $groq_auth "Bearer gsk_NEWKEY";
+    # Load upstream auth + voice-clone identifier from root-readable
+    # includes. NOTE: these files live in /etc/nginx/snippets/, NOT
+    # /etc/nginx/conf.d/ — files there are loaded at http{} scope where
+    # the `set` directive is invalid.
+    # /etc/nginx/snippets/groq-key.conf:
+    #   set $groq_auth "Bearer gsk_NEWKEY";
+    # /etc/nginx/snippets/elevenlabs-key.conf:
+    #   set $elevenlabs_key "sk_…";
+    #   set $elevenlabs_voice_id "<20-char voice id>";
     include /etc/nginx/snippets/groq-key.conf;
+    include /etc/nginx/snippets/elevenlabs-key.conf;
 
     # ─── CORS allow-list (computed at server scope) ──────────
     set $allow_origin "";
@@ -136,6 +144,62 @@ server {
         resolver_timeout      5s;
 
         proxy_pass https://api.groq.com/openai/v1/audio/transcriptions;
+
+        add_header Access-Control-Allow-Origin $allow_origin always;
+        add_header Vary "Origin" always;
+    }
+
+    # ─── ElevenLabs TTS proxy (voice clone) ─────────────────
+    # Browser POSTs JSON {text, model_id, voice_settings}. We inject
+    # the API key and the voice_id (in the URL path) server-side, so
+    # the bundle never sees them. Returns an MP3 stream — keep
+    # proxy_buffering off so the audio bytes flow as they arrive.
+    location = /v1/audio/speech {
+        if ($allow_origin = "") { return 403; }
+
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin  $allow_origin always;
+            add_header Access-Control-Allow-Methods "POST, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "Content-Type" always;
+            add_header Access-Control-Max-Age       86400 always;
+            add_header Content-Length 0 always;
+            add_header Content-Type   "text/plain" always;
+            return 204;
+        }
+
+        if ($request_method != POST) { return 405; }
+
+        # Text-only payload — keep request small so nobody can stuff
+        # massive prompts and burn the quota in one shot.
+        client_max_body_size  8k;
+        client_body_buffer_size 8k;
+
+        limit_req zone=chat_api burst=3 nodelay;
+        limit_req_status 429;
+
+        proxy_request_buffering on;
+        proxy_buffering    off;          # stream MP3 back to browser
+        proxy_http_version 1.1;
+        proxy_set_header   Connection "";
+        proxy_read_timeout 60s;
+
+        # Auth + Accept; voice_id is in the URL via $elevenlabs_voice_id.
+        proxy_set_header xi-api-key    $elevenlabs_key;
+        proxy_set_header Content-Type  "application/json";
+        proxy_set_header Accept        "audio/mpeg";
+        proxy_set_header Host          "api.elevenlabs.io";
+        proxy_set_header Origin        "";
+        proxy_set_header Referer       "";
+        proxy_set_header X-Real-IP        $remote_addr;
+        proxy_set_header X-Forwarded-For  $proxy_add_x_forwarded_for;
+
+        proxy_ssl_server_name on;
+        proxy_ssl_name        api.elevenlabs.io;
+        proxy_ssl_protocols   TLSv1.2 TLSv1.3;
+        resolver              1.1.1.1 8.8.8.8 valid=300s;
+        resolver_timeout      5s;
+
+        proxy_pass https://api.elevenlabs.io/v1/text-to-speech/$elevenlabs_voice_id/stream;
 
         add_header Access-Control-Allow-Origin $allow_origin always;
         add_header Vary "Origin" always;

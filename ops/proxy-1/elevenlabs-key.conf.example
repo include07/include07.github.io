@@ -1,0 +1,9 @@
+# /etc/nginx/snippets/elevenlabs-key.conf
+# Root-readable only (chmod 600). Holds the ElevenLabs API key and the
+# voice_id of the cloned-voice profile. Lives in snippets/ (not conf.d/) so
+# NGINX only loads it where we explicitly `include` it — `set` is illegal at
+# http{} scope.
+# This file is NEVER committed to git — see .gitignore in repo root.
+
+set $elevenlabs_key      "sk_REPLACE_WITH_API_KEY";
+set $elevenlabs_voice_id "REPLACE_WITH_VOICE_ID";

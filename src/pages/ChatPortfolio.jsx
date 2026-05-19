@@ -11,6 +11,7 @@ import { Halo } from "../components/Halo.jsx";
 import { PERSONA_NOTES } from "../lib/persona.js";
 import { relayChat } from "../lib/relay.js";
 import { startRecording, transcribe, isSupported as isVoiceSupported } from "../lib/voice.js";
+import { synthesize, play as playTTS } from "../lib/tts.js";
 import chatCss from "../styles/chat.css?inline";
 
 const TWEAK_DEFAULTS = { lang: "en", dark: false };
@@ -253,6 +254,23 @@ function MoonIcon() {
     </svg>
   );
 }
+function SpeakerIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M11 5L6 9H3v6h3l5 4V5z" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+      <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+    </svg>
+  );
+}
+function StopIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <rect x="6" y="6" width="12" height="12" rx="1.5" />
+    </svg>
+  );
+}
 function MicIcon() {
   return (
     <svg
@@ -284,6 +302,10 @@ export default function ChatPortfolio() {
   const recorderRef = useRef(null);
   const recTimerRef = useRef(null);
   const inputRef = useRef(null);
+  // Per-message TTS state: which message index is loading / playing.
+  const [ttsLoadingIdx, setTtsLoadingIdx] = useState(-1);
+  const [ttsPlayingIdx, setTtsPlayingIdx] = useState(-1);
+  const ttsActiveRef = useRef(null); // { stop } handle from play()
 
   useEffect(() => {
     const html = document.documentElement;
@@ -498,6 +520,43 @@ export default function ChatPortfolio() {
     }
   }
 
+  // ─── TTS playback (click-to-play per bot message) ────────
+  async function togglePlay(idx, text) {
+    // If this message is currently playing, stop it.
+    if (ttsPlayingIdx === idx && ttsActiveRef.current) {
+      ttsActiveRef.current.stop();
+      ttsActiveRef.current = null;
+      setTtsPlayingIdx(-1);
+      return;
+    }
+    // If anything else is playing, stop it before starting this one.
+    if (ttsActiveRef.current) {
+      ttsActiveRef.current.stop();
+      ttsActiveRef.current = null;
+      setTtsPlayingIdx(-1);
+    }
+    setTtsLoadingIdx(idx);
+    try {
+      const url = await synthesize(text, t.lang);
+      setTtsLoadingIdx(-1);
+      setTtsPlayingIdx(idx);
+      const handle = playTTS(url, {
+        onEnded: () => {
+          ttsActiveRef.current = null;
+          setTtsPlayingIdx(-1);
+        },
+        onError: () => {
+          ttsActiveRef.current = null;
+          setTtsPlayingIdx(-1);
+        },
+      });
+      ttsActiveRef.current = handle;
+    } catch (e) {
+      setTtsLoadingIdx(-1);
+      setTtsPlayingIdx(-1);
+    }
+  }
+
   async function cancelMic() {
     const rec = recorderRef.current;
     if (!rec) return;
@@ -595,6 +654,9 @@ export default function ChatPortfolio() {
               {messages.map((m, i) => {
                 const isLast = i === messages.length - 1;
                 const isStreaming = m.role === "assistant" && isLast && m.streaming;
+                const isBot = m.role === "assistant";
+                const isLoading = ttsLoadingIdx === i;
+                const isPlaying = ttsPlayingIdx === i;
                 return (
                   <div
                     key={i}
@@ -619,6 +681,44 @@ export default function ChatPortfolio() {
                           }}
                         />
                       ))}
+                      {isBot && !isStreaming && m.text.trim() && (
+                        <button
+                          type="button"
+                          className={
+                            "tts-btn" +
+                            (isPlaying ? " playing" : "") +
+                            (isLoading ? " loading" : "")
+                          }
+                          onClick={() => togglePlay(i, m.text)}
+                          disabled={isLoading}
+                          aria-label={
+                            isPlaying
+                              ? t.lang === "fr"
+                                ? "Arrêter la lecture"
+                                : "Stop playback"
+                              : t.lang === "fr"
+                                ? "Écouter cette réponse"
+                                : "Listen to this reply"
+                          }
+                          title={
+                            isPlaying
+                              ? t.lang === "fr"
+                                ? "Arrêter"
+                                : "Stop"
+                              : t.lang === "fr"
+                                ? "Écouter"
+                                : "Listen"
+                          }
+                        >
+                          {isLoading ? (
+                            <span className="rec-spinner" />
+                          ) : isPlaying ? (
+                            <StopIcon />
+                          ) : (
+                            <SpeakerIcon />
+                          )}
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
