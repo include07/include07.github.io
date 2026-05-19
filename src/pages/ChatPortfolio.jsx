@@ -429,7 +429,9 @@ export default function ChatPortfolio() {
       const rec = await startRecording();
       recorderRef.current = rec;
       rec.onLevel((rms) => setRecLevel(rms));
-      rec.onSilence(() => finishMic("silence"), 1500);
+      // Auto-stop on silence intentionally disabled — natural speech has
+      // pauses for breath/thought, and cutting users off feels rude.
+      // The mic stops only on manual stop or cancel.
       setVoiceState("recording");
       setRecSeconds(0);
       const t0 = Date.now();
