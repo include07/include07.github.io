@@ -641,12 +641,14 @@ export default function ChatPortfolio() {
                 send();
               }}
             >
-              <ShellPrompt />
+              {voiceState === "idle" && <ShellPrompt />}
               {voiceState === "recording" ? (
                 <div className="rec-bar" role="status" aria-live="polite">
-                  <span className="rec-dot" style={{ transform: `scale(${1 + Math.min(recLevel * 6, 1.4)})` }} />
+                  <span className="rec-dot" style={{ transform: `scale(${1 + Math.min(recLevel * 3, 0.6)})` }} />
                   <span className="rec-text">
-                    {t.lang === "fr" ? "écoute…" : "listening…"} {String(Math.floor(recSeconds / 60)).padStart(1, "0")}:{String(recSeconds % 60).padStart(2, "0")}
+                    <span className="rec-label">{t.lang === "fr" ? "écoute" : "rec"}</span>
+                    {" "}
+                    {String(Math.floor(recSeconds / 60))}:{String(recSeconds % 60).padStart(2, "0")}
                   </span>
                 </div>
               ) : voiceState === "transcribing" ? (
@@ -716,13 +718,15 @@ export default function ChatPortfolio() {
                 </button>
               )}
 
-              <button
-                className="send-btn"
-                type="submit"
-                disabled={!input.trim() || thinking || voiceState !== "idle"}
-              >
-                {t.lang === "fr" ? "Envoyer" : "Send"} →
-              </button>
+              {voiceState === "idle" && (
+                <button
+                  className="send-btn"
+                  type="submit"
+                  disabled={!input.trim() || thinking}
+                >
+                  {t.lang === "fr" ? "Envoyer" : "Send"} →
+                </button>
+              )}
             </form>
 
           </div>
