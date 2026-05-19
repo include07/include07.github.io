@@ -10,6 +10,7 @@ import { useTweaks } from "../lib/tweaks.jsx";
 import { Halo } from "../components/Halo.jsx";
 import { PERSONA_NOTES } from "../lib/persona.js";
 import { relayChat } from "../lib/relay.js";
+import { startRecording, transcribe, isSupported as isVoiceSupported } from "../lib/voice.js";
 import chatCss from "../styles/chat.css?inline";
 
 const TWEAK_DEFAULTS = { lang: "en", dark: false };
@@ -252,6 +253,23 @@ function MoonIcon() {
     </svg>
   );
 }
+function MicIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5 11a7 7 0 0 0 14 0" />
+      <path d="M12 18v3" />
+    </svg>
+  );
+}
 
 export default function ChatPortfolio() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
@@ -259,7 +277,12 @@ export default function ChatPortfolio() {
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [highlight, setHighlight] = useState([]);
+  const [voiceState, setVoiceState] = useState("idle"); // idle | recording | transcribing
+  const [recLevel, setRecLevel] = useState(0);
+  const [recSeconds, setRecSeconds] = useState(0);
   const logRef = useRef(null);
+  const recorderRef = useRef(null);
+  const recTimerRef = useRef(null);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -384,6 +407,91 @@ export default function ChatPortfolio() {
     } finally {
       setThinking(false);
     }
+  }
+
+  // ─── Voice (Whisper) ──────────────────────────────────────
+  async function startMic() {
+    if (voiceState !== "idle" || thinking) return;
+    if (!isVoiceSupported()) {
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          text:
+            t.lang === "fr"
+              ? "Ton navigateur ne supporte pas le micro. Tape ta question."
+              : "Your browser doesn't support the mic. Type your question instead.",
+        },
+      ]);
+      return;
+    }
+    try {
+      const rec = await startRecording();
+      recorderRef.current = rec;
+      rec.onLevel((rms) => setRecLevel(rms));
+      rec.onSilence(() => finishMic("silence"), 1500);
+      setVoiceState("recording");
+      setRecSeconds(0);
+      const t0 = Date.now();
+      recTimerRef.current = setInterval(() => {
+        setRecSeconds(Math.floor((Date.now() - t0) / 1000));
+      }, 250);
+    } catch (e) {
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          text:
+            t.lang === "fr"
+              ? "Je n'ai pas pu accéder au micro. Vérifie les autorisations du site."
+              : "Couldn't access the mic. Check site permissions.",
+        },
+      ]);
+    }
+  }
+
+  async function finishMic(/* reason */) {
+    const rec = recorderRef.current;
+    if (!rec) return;
+    recorderRef.current = null;
+    if (recTimerRef.current) clearInterval(recTimerRef.current);
+    recTimerRef.current = null;
+
+    setVoiceState("transcribing");
+    setRecLevel(0);
+    try {
+      const result = await rec.stop();
+      if (!result || !result.blob || result.blob.size === 0) {
+        setVoiceState("idle");
+        return;
+      }
+      const text = await transcribe(result.blob, t.lang);
+      if (text) setInput((cur) => (cur ? cur.trimEnd() + " " + text : text));
+    } catch (e) {
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          text:
+            t.lang === "fr"
+              ? "Transcription échouée. Réessaie ou tape la question."
+              : "Transcription failed. Try again or type the question.",
+        },
+      ]);
+    } finally {
+      setVoiceState("idle");
+    }
+  }
+
+  async function cancelMic() {
+    const rec = recorderRef.current;
+    if (!rec) return;
+    recorderRef.current = null;
+    if (recTimerRef.current) clearInterval(recTimerRef.current);
+    recTimerRef.current = null;
+    setRecLevel(0);
+    try { await rec.cancel(); } catch (_) {}
+    setVoiceState("idle");
   }
 
   return (
@@ -532,24 +640,84 @@ export default function ChatPortfolio() {
               }}
             >
               <ShellPrompt />
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "l") {
-                    e.preventDefault();
-                    setMessages([]);
-                    setHighlight([]);
-                    setInput("");
-                  }
-                }}
-                placeholder={head.placeholder}
-                aria-label="Message"
-              />
+              {voiceState === "recording" ? (
+                <div className="rec-bar" role="status" aria-live="polite">
+                  <span className="rec-dot" style={{ transform: `scale(${1 + Math.min(recLevel * 6, 1.4)})` }} />
+                  <span className="rec-text">
+                    {t.lang === "fr" ? "écoute…" : "listening…"} {String(Math.floor(recSeconds / 60)).padStart(1, "0")}:{String(recSeconds % 60).padStart(2, "0")}
+                  </span>
+                </div>
+              ) : voiceState === "transcribing" ? (
+                <div className="rec-bar" role="status" aria-live="polite">
+                  <span className="rec-spinner" aria-hidden="true" />
+                  <span className="rec-text">
+                    {t.lang === "fr" ? "transcription…" : "transcribing…"}
+                  </span>
+                </div>
+              ) : (
+                <input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "l") {
+                      e.preventDefault();
+                      setMessages([]);
+                      setHighlight([]);
+                      setInput("");
+                    }
+                  }}
+                  placeholder={head.placeholder}
+                  aria-label="Message"
+                />
+              )}
+
+              {voiceState === "recording" ? (
+                <>
+                  <button
+                    type="button"
+                    className="mic-btn mic-cancel"
+                    onClick={cancelMic}
+                    aria-label={t.lang === "fr" ? "Annuler" : "Cancel"}
+                    title={t.lang === "fr" ? "Annuler" : "Cancel"}
+                  >
+                    ✕
+                  </button>
+                  <button
+                    type="button"
+                    className="mic-btn mic-stop"
+                    onClick={() => finishMic("manual")}
+                    aria-label={t.lang === "fr" ? "Arrêter" : "Stop"}
+                    title={t.lang === "fr" ? "Arrêter" : "Stop"}
+                  >
+                    ■
+                  </button>
+                </>
+              ) : voiceState === "transcribing" ? (
+                <button
+                  type="button"
+                  className="mic-btn"
+                  disabled
+                  aria-label={t.lang === "fr" ? "Transcription en cours" : "Transcribing"}
+                >
+                  ⋯
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="mic-btn"
+                  onClick={startMic}
+                  disabled={thinking}
+                  aria-label={t.lang === "fr" ? "Dicter" : "Voice input"}
+                  title={t.lang === "fr" ? "Dicter (FR/EN)" : "Voice input (FR/EN)"}
+                >
+                  <MicIcon />
+                </button>
+              )}
+
               <button
                 className="send-btn"
                 type="submit"
-                disabled={!input.trim() || thinking}
+                disabled={!input.trim() || thinking || voiceState !== "idle"}
               >
                 {t.lang === "fr" ? "Envoyer" : "Send"} →
               </button>

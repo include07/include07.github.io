@@ -86,6 +86,61 @@ server {
     # The browser now calls api.web3forms.com directly; Web3Forms's own
     # domain whitelist (include07.github.io) is the abuse control.
 
+    # ─── Whisper transcription proxy ────────────────────────
+    # Multipart/form-data upload of an audio blob; returns JSON {text:"…"}.
+    location = /v1/audio/transcriptions {
+        if ($allow_origin = "") { return 403; }
+
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin  $allow_origin always;
+            add_header Access-Control-Allow-Methods "POST, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "Content-Type" always;
+            add_header Access-Control-Max-Age       86400 always;
+            add_header Content-Length 0 always;
+            add_header Content-Type   "text/plain" always;
+            return 204;
+        }
+
+        if ($request_method != POST) { return 405; }
+
+        # Audio uploads need more than the default 64k body limit.
+        # Whisper accepts up to 25 MB; 10 MB is plenty for short clips.
+        client_max_body_size  10m;
+        client_body_buffer_size 1m;
+
+        # Slightly tighter rate limit — transcription is per-utterance,
+        # not per-keystroke. Burst lets a quick re-attempt through.
+        limit_req zone=chat_api burst=3 nodelay;
+        limit_req_status 429;
+
+        # Buffer the multipart request body so NGINX can set Content-Length
+        # upstream (Groq's API needs it).
+        proxy_request_buffering on;
+        proxy_buffering    off;
+        proxy_http_version 1.1;
+        proxy_set_header   Connection "";
+        proxy_read_timeout 60s;
+
+        # Inject auth, preserve client's multipart Content-Type as-is.
+        proxy_set_header Authorization $groq_auth;
+        proxy_set_header Host          "api.groq.com";
+        proxy_set_header Origin        "";
+        proxy_set_header Referer       "";
+        proxy_set_header X-Real-IP        $remote_addr;
+        proxy_set_header X-Forwarded-For  $proxy_add_x_forwarded_for;
+
+        proxy_ssl_server_name on;
+        proxy_ssl_name        api.groq.com;
+        proxy_ssl_protocols   TLSv1.2 TLSv1.3;
+        resolver              1.1.1.1 8.8.8.8 valid=300s;
+        resolver_timeout      5s;
+
+        proxy_pass https://api.groq.com/openai/v1/audio/transcriptions;
+
+        add_header Access-Control-Allow-Origin $allow_origin always;
+        add_header Vary "Origin" always;
+    }
+
     # Anything else → 404
     location / { return 404; }
 }
