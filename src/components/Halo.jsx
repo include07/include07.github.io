@@ -69,13 +69,22 @@ function Orb({ ic, pos, hot, onTechClick, lang }) {
     ? (lang === "fr" ? `${ic.label} — utilisé sur ${ic.project}` : `${ic.label} — used on ${ic.project}`)
     : ic.label;
 
+  // Inner span isolates "stay upright + scale on hover" from the outer
+  // counter-rotation animation. Without this split, hover transform overrides
+  // the counter-rotation and both the icon and the tooltip end up tilted.
+  const inner = (
+    <span className="orb-inner">
+      <img src={`https://cdn.simpleicons.org/${ic.slug}/currentColor`} alt="" aria-hidden="true" />
+      <span className="tip">{tipText}</span>
+    </span>
+  );
+
   if (!hasProject) {
     return (
       <a className="orb" href={ic.href} target="_blank" rel="noopener"
          style={pos}
          data-hot={hot ? "true" : "false"}>
-        <img src={`https://cdn.simpleicons.org/${ic.slug}/currentColor`} alt="" aria-hidden="true" />
-        <span className="tip">{tipText}</span>
+        {inner}
       </a>
     );
   }
@@ -85,8 +94,7 @@ function Orb({ ic, pos, hot, onTechClick, lang }) {
             style={pos}
             data-hot={hot ? "true" : "false"}
             onClick={() => onTechClick && onTechClick(ic.project, ic.label)}>
-      <img src={`https://cdn.simpleicons.org/${ic.slug}/currentColor`} alt="" aria-hidden="true" />
-      <span className="tip">{tipText}</span>
+      {inner}
     </button>
   );
 }
