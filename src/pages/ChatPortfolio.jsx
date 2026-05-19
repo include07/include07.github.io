@@ -283,6 +283,7 @@ export default function ChatPortfolio() {
   const logRef = useRef(null);
   const recorderRef = useRef(null);
   const recTimerRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -297,6 +298,16 @@ export default function ChatPortfolio() {
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [messages, thinking]);
+
+  // Auto-grow the composer textarea between 1 and ~3 lines.
+  // Runs after every value change (typed OR programmatic from voice).
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const max = 84; // ~3 lines at 14px / 1.4 line-height + padding
+    el.style.height = `${Math.min(el.scrollHeight, max)}px`;
+  }, [input, voiceState]);
 
   const head = HEADING[t.lang] || HEADING.en;
   const fb = FALLBACK[t.lang] || FALLBACK.en;
@@ -659,10 +670,19 @@ export default function ChatPortfolio() {
                   </span>
                 </div>
               ) : (
-                <input
+                <textarea
+                  ref={inputRef}
+                  rows={1}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
+                    // Enter submits; Shift+Enter inserts a newline.
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      send();
+                      return;
+                    }
+                    // Ctrl/Cmd+L clears the chat (terminal muscle memory).
                     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "l") {
                       e.preventDefault();
                       setMessages([]);
