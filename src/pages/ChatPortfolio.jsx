@@ -394,8 +394,10 @@ export default function ChatPortfolio() {
           <b>J·EF</b> / Chat Portfolio · 26
         </div>
         <div className="topbar-right">
-          <Link to="/editorial" className="editorial-btn">
-            {t.lang === "fr" ? "Version éditoriale" : "Editorial version"}
+          <Link to="/editorial" className="editorial-btn" aria-label={t.lang === "fr" ? "Version éditoriale" : "Editorial version"}>
+            <span className="label-text">
+              {t.lang === "fr" ? "Version éditoriale" : "Editorial version"}
+            </span>
             <span className="arr">↗</span>
           </Link>
           <div className="seg" role="tablist" aria-label="Language">

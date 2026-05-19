@@ -141,7 +141,7 @@ html[data-dark="true"] .orb img{filter:invert(1) brightness(1.1)}
 .portrait[data-thinking="true"] .pulse{animation-duration:1.2s;opacity:.6}
 
 /* chat column */
-.chat-col{display:flex;flex-direction:column;gap:18px;max-width:560px}
+.chat-col{display:flex;flex-direction:column;gap:18px;max-width:560px;width:100%;min-width:0}
 .chat-eyebrow{
   font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
   display:flex;align-items:center;gap:10px;
@@ -160,13 +160,14 @@ html[data-dark="true"] .orb img{filter:invert(1) brightness(1.1)}
   background:var(--paper);border:1px solid var(--rule);border-radius:8px;
   padding:18px 20px;min-height:340px;
   font-family:var(--mono);
+  width:100%;max-width:100%;min-width:0;box-sizing:border-box;
 }
 .chat-log{
   display:flex;flex-direction:column;gap:14px;
   max-height:420px;overflow-y:auto;padding:4px 0;
 }
 .msg{display:flex;gap:0;align-items:flex-start;font-family:var(--mono);font-size:13.5px;line-height:1.6;flex-wrap:wrap}
-.msg .body{flex:1 1 100%;color:var(--ink);white-space:pre-wrap;word-wrap:break-word}
+.msg .body{flex:1 1 100%;min-width:0;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
 .msg .body p{margin:0 0 8px}
 .msg .body p:last-child{margin-bottom:0}
 .msg .body strong{color:var(--accent);font-weight:600}
@@ -223,10 +224,11 @@ html[data-dark="true"] .shell-prompt .p{color:#79B8E0}
 }
 .composer .shell-prompt{font-size:14px;margin-right:6px;padding-left:2px}
 .composer input{
-  flex:1;appearance:none;background:transparent;border:0;outline:0;
+  flex:1 1 0;min-width:0;appearance:none;background:transparent;border:0;outline:0;
   font-family:var(--mono);font-size:14px;color:var(--ink);padding:8px 4px;
   caret-color:var(--accent);
 }
+.composer .send-btn{flex:none}
 .composer input::placeholder{color:var(--muted);font-family:var(--mono)}
 .send-btn{
   appearance:none;border:1px solid var(--ink);background:var(--ink);color:var(--bg);
@@ -312,3 +314,68 @@ html[data-dark="true"] .shell-prompt .p{color:#79B8E0}
   background:var(--paper);
 }
 .status-strip span b{color:var(--ink);font-weight:600;margin-right:6px}
+
+/* ─── Narrow viewports (mobile, narrow tablets) ───────── */
+@media (max-width: 720px) {
+  /* Topbar: tighten padding, shrink brand, hide brand sub-line so it doesn't wrap.
+     Editorial button collapses to icon-only. */
+  .topbar{padding:12px 16px;gap:8px}
+  .topbar .brand{font-size:10px;letter-spacing:.12em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px}
+  .topbar-right{gap:8px}
+  .editorial-btn{padding:6px 10px;font-size:10px;letter-spacing:.1em}
+  .editorial-btn .label-text{display:none}
+
+  /* Status strip: wrap rather than space-between, keep readable, hide BUILT field
+     which is the least informative on mobile. */
+  .status-strip{
+    flex-wrap:wrap;gap:6px 14px;
+    padding:8px 16px;justify-content:flex-start;font-size:9px;letter-spacing:.12em;
+  }
+  .status-strip span{white-space:nowrap}
+  .status-strip span:nth-child(4){display:none}
+
+  /* Stage padding tighter so chat shell gets viewport width. */
+  .stage{padding:24px 16px 60px;gap:16px}
+
+  /* Halo column: cap height so the orbit doesn't dominate the viewport,
+     and prevent overflow. Inner ring stays visible; outer ring may be tight
+     but won't push the page wider. */
+  .halo-col{max-width:420px;margin:0 auto}
+  .orb{width:48px;height:48px;margin:-24px 0 0 -24px}
+  .orb img{width:22px;height:22px}
+  .portrait{width:140px;height:140px}
+  .portrait .portrait-img{width:140px;height:140px}
+
+  /* Chat hero typography scales down. */
+  .chat-h1{font-size:34px;letter-spacing:-.02em}
+  .chat-eyebrow{font-size:9.5px;letter-spacing:.16em}
+
+  /* Chat shell padding tighter; chat-log smaller max-height. */
+  .chat-shell{padding:14px 14px;min-height:280px}
+  .chat-log{max-height:340px}
+
+  /* Composer can wrap if the prompt + input + send don't all fit on one line. */
+  .composer{flex-wrap:wrap}
+  .composer .shell-prompt{font-size:12px}
+  .composer input{font-size:13.5px}
+  .composer .send-btn{margin-left:auto}
+
+  /* Chips: smaller, full content visible. */
+  .suggested{padding-left:0}
+  .chip{font-size:10.5px;padding:5px 8px}
+
+  /* Shell prompt in messages: tighter on mobile. */
+  .msg, .msg .body, .shell-prompt{font-size:12.5px}
+
+  /* Fallback "Prefer the full editorial" header doesn't overflow. */
+  .fallback{padding:48px 16px}
+  .fallback h2{font-size:34px}
+}
+
+/* Very narrow (≤ 380px) — extreme tightening. */
+@media (max-width: 380px) {
+  .topbar .brand{display:none}
+  .orb{width:42px;height:42px;margin:-21px 0 0 -21px}
+  .orb img{width:18px;height:18px}
+  .chat-h1{font-size:30px}
+}
