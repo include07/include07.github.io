@@ -299,14 +299,16 @@ export default function ChatPortfolio() {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [messages, thinking]);
 
-  // Auto-grow the composer textarea between 1 and ~3 lines.
-  // Runs after every value change (typed OR programmatic from voice).
+  // Auto-grow the composer textarea. Cap is whatever max-height the CSS
+  // declares (84px on desktop, 140px on mobile), so we don't need to know
+  // the viewport in JS — the breakpoint owns that decision.
   useEffect(() => {
     const el = inputRef.current;
     if (!el) return;
     el.style.height = "auto";
-    const max = 84; // ~3 lines at 14px / 1.4 line-height + padding
-    el.style.height = `${Math.min(el.scrollHeight, max)}px`;
+    const cssMax = parseFloat(getComputedStyle(el).maxHeight);
+    const cap = Number.isFinite(cssMax) && cssMax > 0 ? cssMax : 84;
+    el.style.height = `${Math.min(el.scrollHeight, cap)}px`;
   }, [input, voiceState]);
 
   const head = HEADING[t.lang] || HEADING.en;

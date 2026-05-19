@@ -440,11 +440,21 @@ html[data-dark="true"] .shell-prompt .p{color:#79B8E0}
   .chat-shell{padding:14px 14px;min-height:280px}
   .chat-log{max-height:340px}
 
-  /* Composer can wrap if the prompt + input + send don't all fit on one line. */
-  .composer{flex-wrap:wrap}
-  .composer .shell-prompt{font-size:12px}
+  /* Composer on mobile: stack into rows.
+     row 1: shell prompt (its own thin line — preserves terminal feel)
+     row 2: textarea, full width — wraps naturally like a text editor
+     row 3: action buttons (mic + send for idle; ✕ + ■ for recording).
+     Each row is achieved by setting flex-basis: 100% on the splitting
+     items, so the next item is forced onto a new row. */
+  .composer{flex-wrap:wrap;align-items:center;gap:6px 8px}
+  .composer .shell-prompt{flex:0 0 100%;font-size:11.5px;margin-bottom:-2px}
+  .composer input,
+  .composer textarea,
+  .composer .rec-bar{flex:0 0 100%;width:100%;min-width:0}
   .composer input{font-size:13.5px}
-  .composer .send-btn{margin-left:auto}
+  .composer textarea{font-size:13.5px;min-height:38px;max-height:140px}
+  .composer .mic-btn{flex:0 0 auto}
+  .composer .send-btn{flex:0 0 auto;margin-left:auto}
 
   /* Chips: smaller, full content visible. */
   .suggested{padding-left:0}
