@@ -28,6 +28,15 @@ const GROQ_DIRECT_URL =
 const LS_KEY = "portfolio.groq.apiKey";
 const WHISPER_MODEL = "whisper-large-v3-turbo";
 
+/* Vocabulary hint passed to Whisper as the `prompt` parameter. It biases the
+ * model toward proper nouns and project names it would otherwise mangle
+ * (SIANA → "sienna", QtoDash → "Cuto Dash", Jalaleddin → "Jalal a den", etc).
+ * Must match the audio language. Capped to ~224 tokens by Whisper. */
+const VOCAB_PROMPT = {
+  en: "Conversation with Jalaleddin El Firqi, AI and full-stack engineer from ENSAM Meknès. Employers: SIANA (joint-venture ONCF × SNCF), AI-Inside, JESA. Projects: QtoDash, Sawti, SegmaVisionPro, SI-ESSIEUX, QC Management System, Innov'AM inspection robot. Schools: UEMF, EIDIA, EMINES, ENSIAS, 1337 Khouribga. Tech: YOLOv8, Grounding DINO, NVIDIA Triton, Coqui XTTS-v2, scikit-learn, XGBoost, MLflow, Kubernetes, GitLab CI, NGINX, Docker, Django, Flask, React, TypeScript, PostgreSQL, SQL Server, MinIO, Raspberry Pi.",
+  fr: "Conversation avec Jalaleddin El Firqi, ingénieur IA et full-stack issu de l'ENSAM Meknès. Employeurs : SIANA (joint-venture ONCF × SNCF), AI-Inside, JESA. Projets : QtoDash, Sawti, SegmaVisionPro, SI-ESSIEUX, QC Management System, robot d'inspection Innov'AM. Écoles : UEMF, EIDIA, EMINES, ENSIAS, 1337 Khouribga. Tech : YOLOv8, Grounding DINO, NVIDIA Triton, Coqui XTTS-v2, scikit-learn, XGBoost, MLflow, Kubernetes, GitLab CI, NGINX, Docker, Django, Flask, React, TypeScript, PostgreSQL, SQL Server, MinIO, Raspberry Pi.",
+};
+
 function getLocalGroqKey() {
   if (typeof window === "undefined") return "";
   return (window.localStorage.getItem(LS_KEY) || "").trim();
@@ -181,6 +190,9 @@ export async function transcribe(blob, lang) {
   form.append("file", blob, `audio.${ext}`);
   form.append("model", WHISPER_MODEL);
   if (lang) form.append("language", lang); // 'en' | 'fr'
+  // Vocabulary hint — bias Whisper toward the proper nouns it would mangle.
+  const vocab = VOCAB_PROMPT[lang] || VOCAB_PROMPT.en;
+  if (vocab) form.append("prompt", vocab);
   form.append("response_format", "json");
   form.append("temperature", "0");
 
