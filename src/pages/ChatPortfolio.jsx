@@ -171,7 +171,7 @@ const HEADING = {
       </>
     ),
     sub: "This page is me, in conversation. Hit a chip below or type a question — I'll answer in real time. The orbiting icons highlight when I mention a tool I use.",
-    placeholder: "Ask about projects, infra, AI, availability…",
+    placeholder: "Ask about my work…",
   },
   fr: {
     eyebrow: "En direct · Parlez à mon portfolio",
@@ -181,7 +181,7 @@ const HEADING = {
       </>
     ),
     sub: "Cette page, c'est moi en conversation. Choisissez une suggestion ou tapez une question — je réponds en direct. Les icônes en orbite s'illuminent quand je mentionne un outil.",
-    placeholder: "Projets, infra, IA, disponibilité…",
+    placeholder: "Pose une question…",
   },
 };
 
