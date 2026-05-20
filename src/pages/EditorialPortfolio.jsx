@@ -158,7 +158,13 @@ export default function EditorialPortfolio() {
               <p className="lede">{c.lede}</p>
               <div className="hero-actions">
                 {c.actions.map((a, i) => (
-                  <a key={i} className={"btn " + (a.kind === "primary" ? "primary" : "")} href="#contact">
+                  <a
+                    key={i}
+                    className={"btn " + (a.kind === "primary" ? "primary" : "")}
+                    href={a.href || "#contact"}
+                    {...(a.download ? { download: a.download } : {})}
+                    {...(a.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  >
                     {a.label}<span className="arr">{a.arr}</span>
                   </a>
                 ))}
@@ -347,17 +353,36 @@ export default function EditorialPortfolio() {
             </a>
           </div>
           <div className="contact-side">
-            {c.contact.rows.map((r, i) => (
-              <div key={i} className="contact-row">
-                <span className="k">{r.k}</span>
-                <a className="v"
-                   href={
-                     r.k === "Email" ? `mailto:${r.v}` :
-                     (r.k === "Phone" || r.k === "Téléphone") ? `tel:${r.v.replace(/\s/g, "")}` :
-                     r.k === "GitHub" ? `https://${r.v}` : "#"
-                   }>{r.v}</a>
-              </div>
-            ))}
+            {c.contact.rows.map((r, i) => {
+              const isLink =
+                r.k === "Email" ||
+                r.k === "Phone" || r.k === "Téléphone" ||
+                r.k === "GitHub" ||
+                r.k === "LinkedIn";
+              const href =
+                r.k === "Email" ? `mailto:${r.v}` :
+                (r.k === "Phone" || r.k === "Téléphone") ? `tel:${r.v.replace(/[\s()\-]/g, "")}` :
+                r.k === "GitHub" ? `https://${r.v.replace(/^https?:\/\//, "")}` :
+                r.k === "LinkedIn" ? `https://${r.v.replace(/^https?:\/\//, "")}` :
+                null;
+              const external = r.k === "GitHub" || r.k === "LinkedIn";
+              return (
+                <div key={i} className="contact-row">
+                  <span className="k">{r.k}</span>
+                  {isLink ? (
+                    <a
+                      className="v"
+                      href={href}
+                      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    >
+                      {r.v}
+                    </a>
+                  ) : (
+                    <span className="v">{r.v}</span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
 

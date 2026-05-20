@@ -26,9 +26,9 @@ const C = {
       </>
     ),
     actions: [
-      { kind: "primary", label: "Download CV", arr: "↓" },
-      { kind: "ghost", label: "Email me", arr: "→" },
-      { kind: "ghost", label: "GitHub", arr: "↗" },
+      { kind: "primary", label: "Download CV", arr: "↓", href: "/cv_industrial_ai.pdf", download: "Jalaleddin-El-Firqi-CV.pdf" },
+      { kind: "ghost", label: "Email me", arr: "→", href: "mailto:j.elfirqi@gmail.com" },
+      { kind: "ghost", label: "GitHub", arr: "↗", href: "https://github.com/include07", external: true },
     ],
     stats: [
       { v: "3×", l: "Industry roles" },
@@ -505,9 +505,9 @@ const C = {
       </>
     ),
     actions: [
-      { kind: "primary", label: "Télécharger le CV", arr: "↓" },
-      { kind: "ghost", label: "M'écrire", arr: "→" },
-      { kind: "ghost", label: "GitHub", arr: "↗" },
+      { kind: "primary", label: "Télécharger le CV", arr: "↓", href: "/cv_industrial_ai.pdf", download: "Jalaleddin-El-Firqi-CV.pdf" },
+      { kind: "ghost", label: "M'écrire", arr: "→", href: "mailto:j.elfirqi@gmail.com" },
+      { kind: "ghost", label: "GitHub", arr: "↗", href: "https://github.com/include07", external: true },
     ],
     stats: [
       { v: "3×", l: "Postes en industrie" },
