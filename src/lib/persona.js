@@ -12,10 +12,11 @@ export const PERSONA_NOTES = {
   en: `
 POSITIONING
 - Role: AI & full-stack engineer for industry. Coverage spans the full software lifecycle: needs analysis, ML/DS modelling, web app development (React/Django/Flask), and deployment.
+- Status: graduated in July 2026 — State Engineer diploma in hand (With Honors / Mention Bien). Actively looking for a first full-time role in AI & data science for industry.
 
-SIANA — final-year project (PFE), Tangier, since Feb 2026
+SIANA — final-year project (PFE), Tangier, Feb–Aug 2026 (completed)
 - Joint-venture ONCF × SNCF, axle-maintenance digitalization for 12 TGV trainsets (366 axles).
-- Owned the full lifecycle: requirements & AS-IS analysis, TO-BE design, CdCF (BPMN, UML, UX/UI, permissions, migration strategy), built SI-ESSIEUX (React/TypeScript + Django + SQL Server), set up the automated RUL training pipeline, prepared test/recette and progressive deployment with double-entry.
+- Owned the full lifecycle: requirements & AS-IS analysis, TO-BE design, CdCF (BPMN, UML, UX/UI, permissions, migration strategy), built SI-ESSIEUX (React/TypeScript + Django + SQL Server), set up the automated RUL training pipeline, and shipped the platform to production — validated against the legacy process through a progressive double-entry (parallel-run) rollout.
 - The RUL pipeline uses survival analysis and gradient boosting on engineered features from inspection-interval data. Deep learning approaches like LSTMs are not appropriate here because the data is censored inspection intervals, not rich sensor streams.
 - CI/CD runs on GitLab CI.
 
@@ -54,12 +55,12 @@ DISTINCTIONS
 - 1337 Khouribga 2022: mentor role at the Moroccan National Programming Contest.
 
 EDUCATION
-- ENSAM Meknès, 2020–2026: State Engineer — Industrial Engineering, AI & Data Science option.
+- ENSAM Meknès, 2020–2026: State Engineer — Industrial Engineering, AI & Data Science option. Graduated July 2026, With Honors (Mention Bien).
 - UEMF (Université Euromed de Fès), 2019–2020: EIDIA, Math & Computer Science prep year.
 - Lycée Moulay Bouchaïb, Azemmour, 2018–2019: Baccalauréat — Sciences Physiques.
 
 CURRENT LOCATION & AVAILABILITY
-- Based in Tangier (SIANA placement). Open to relocation. Available from August 2026.
+- Based in Azemmour, Morocco. Open to relocation (Casablanca and beyond). Graduated and available immediately — looking for a first full-time position.
 - Trilingual: Arabic (native), French (TCF C2), English (TOEFL C1).
 
 THE PORTRAIT ON THIS PAGE
@@ -69,10 +70,11 @@ THE PORTRAIT ON THIS PAGE
   fr: `
 POSITIONNEMENT
 - Rôle : ingénieur IA & full-stack pour l'industrie. Couverture du cycle logiciel complet : analyse du besoin, modélisation ML/DS, développement d'applications web (React/Django/Flask), déploiement.
+- Statut : diplômé en juillet 2026 — diplôme d'Ingénieur d'État en poche (Mention Bien). En recherche active d'un premier poste en IA & data science pour l'industrie.
 
-SIANA — PFE, Tanger, depuis fév. 2026
+SIANA — PFE, Tanger, fév.–août 2026 (terminé)
 - Joint-venture ONCF × SNCF, digitalisation de la maintenance des essieux pour 12 rames TGV (366 essieux).
-- Cycle complet : analyse du besoin & AS-IS, conception TO-BE, CdCF (BPMN, UML, UX/UI, permissions, stratégie de migration), développement de SI-ESSIEUX (React/TypeScript + Django + SQL Server), pipeline RUL automatisé, préparation tests/recette et déploiement progressif en double saisie.
+- Cycle complet : analyse du besoin & AS-IS, conception TO-BE, CdCF (BPMN, UML, UX/UI, permissions, stratégie de migration), développement de SI-ESSIEUX (React/TypeScript + Django + SQL Server), pipeline RUL automatisé, et application livrée en production — validée face au processus historique par un déploiement progressif en double saisie (parallel run).
 - Le pipeline RUL utilise l'analyse de survie et le gradient boosting sur des features ingénierées issues de données d'intervalles d'inspection. Les approches deep learning type LSTM ne conviennent pas : les données sont des intervalles d'inspection censurés, pas des flux capteurs riches.
 - CI/CD via GitLab CI.
 
@@ -111,12 +113,12 @@ DISTINCTIONS
 - 1337 Khouribga 2022 : rôle de mentor au Moroccan National Programming Contest.
 
 FORMATION
-- ENSAM Meknès, 2020–2026 : Ingénieur d'État — Génie Industriel, option IA & Data Science.
+- ENSAM Meknès, 2020–2026 : Ingénieur d'État — Génie Industriel, option IA & Data Science. Diplômé en juillet 2026, Mention Bien.
 - UEMF (Université Euromed de Fès), 2019–2020 : EIDIA, année préparatoire Mathématiques & Informatique.
 - Lycée Moulay Bouchaïb, Azemmour, 2018–2019 : Baccalauréat — Sciences Physiques.
 
 LOCALISATION & DISPONIBILITÉ
-- Basé à Tanger (placement SIANA). Ouvert à la mobilité. Disponible à partir d'août 2026.
+- Basé à Azemmour, Maroc. Ouvert à la mobilité (Casablanca et au-delà). Diplômé et disponible immédiatement — en recherche d'un premier poste.
 - Trilingue : arabe (natif), français (TCF C2), anglais (TOEFL C1).
 
 LE PORTRAIT SUR CETTE PAGE
