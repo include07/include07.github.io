@@ -199,6 +199,15 @@ server {
         resolver              1.1.1.1 8.8.8.8 valid=300s;
         resolver_timeout      5s;
 
+        # ElevenLabs sends its own CORS headers (ACAO: *); combined with
+        # ours below the browser sees a duplicate Access-Control-Allow-Origin
+        # and rejects the response. Hide everything CORS from upstream.
+        proxy_hide_header Access-Control-Allow-Origin;
+        proxy_hide_header Access-Control-Allow-Methods;
+        proxy_hide_header Access-Control-Allow-Headers;
+        proxy_hide_header Access-Control-Expose-Headers;
+        proxy_hide_header Access-Control-Max-Age;
+
         proxy_pass https://api.elevenlabs.io/v1/text-to-speech/$elevenlabs_voice_id/stream;
 
         add_header Access-Control-Allow-Origin $allow_origin always;
