@@ -19,8 +19,11 @@ const PROXY_URL =
     import.meta.env.VITE_CHAT_API_URL) ||
   DEFAULT_PROXY_URL;
 const GROQ_DIRECT_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "llama-3.3-70b-versatile";
-const GROQ_CLASSIFIER_MODEL = "llama-3.1-8b-instant";
+// Groq retired the llama-3.x models (Aug 2026) — gpt-oss are the current production models.
+// These are reasoning models: keep reasoning_effort low and leave token headroom,
+// otherwise short max_tokens yields empty content (budget consumed by reasoning).
+const GROQ_MODEL = "openai/gpt-oss-120b";
+const GROQ_CLASSIFIER_MODEL = "openai/gpt-oss-20b";
 const LS_KEY = "portfolio.groq.apiKey";
 
 function getLocalGroqKey() {
@@ -55,7 +58,8 @@ async function askGroq(messages) {
     body: JSON.stringify({
       model: GROQ_MODEL,
       temperature: 0.3,
-      max_tokens: 700,
+      max_tokens: 1024,
+      reasoning_effort: "low",
       messages,
     }),
   });
@@ -81,7 +85,8 @@ async function streamGroq(messages, onChunk) {
     body: JSON.stringify({
       model: GROQ_MODEL,
       temperature: 0.3,
-      max_tokens: 700,
+      max_tokens: 1024,
+      reasoning_effort: "low",
       stream: true,
       messages,
     }),
@@ -144,7 +149,8 @@ async function classifyGroq(userText) {
       body: JSON.stringify({
         model: GROQ_CLASSIFIER_MODEL,
         temperature: 0,
-        max_tokens: 4,
+        max_tokens: 150,
+        reasoning_effort: "low",
         messages: [
           { role: "system", content: CLASSIFIER_SYSTEM },
           { role: "user", content: userText },
